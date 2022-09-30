@@ -1,0 +1,76 @@
+package dod.p1.kc.routing.redirects.runtime;
+
+import org.jboss.logging.Logger;
+import java.util.HashMap;
+import io.vertx.core.Handler;
+import io.vertx.ext.web.RoutingContext;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+import io.quarkus.vertx.http.runtime.filters.Filters;
+
+@ApplicationScoped
+public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
+  private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsHandler.class.getName());
+  private static HashMap<String, String> urlsMap = null;
+  private static HashMap<String, String> pathPrefixesMap = null;
+  private static HashMap<String, String> pathFiltersMap = null;
+
+  @Override
+  public void handle(RoutingContext rc) {
+
+      //Works but might be slow
+      // urlsMap.forEach((k, v) -> {
+      //   if (rc.normalizedPath().equals(k) || rc.normalizedPath().equals(k + '/')) {
+      //     LOGGER.infof("Redirect Match: %s to %s", k, v);
+      //     rc.redirect(v);
+      //   }
+      // });
+      //Should be the same as above but faster.
+      if (urlsMap.containsKey(rc.normalizedPath())) {
+        LOGGER.debugf("Redirect Match: %s to %s", rc.normalizedPath(), urlsMap.get(rc.normalizedPath()));
+        rc.redirect(urlsMap.get(rc.normalizedPath()));
+      }
+
+      pathPrefixesMap.forEach((k, v) -> {
+        if (rc.normalizedPath().startsWith(k)) {
+            LOGGER.debugf("PathPrefixing Match: %s to %s", k, v);
+            //LOGGER.infof("uri before: %s", rc.request().uri());
+            rc.redirect(rc.request().uri().replace(k, v));
+            //LOGGER.infof("uri after: %s",rc.request().uri().replace(k, v));
+        }
+      });
+
+      if (pathFiltersMap.containsKey(rc.normalizedPath())) {
+        LOGGER.infof("uri before: %s", rc.request().uri());
+        LOGGER.infof("NormalizedPath before: %s", rc.normalizedPath());
+        LOGGER.infof("Path before: %s", rc.request().path());
+        LOGGER.infof("query before: %s", rc.request().query());
+        //LOGGER.infof("Headers before: %s", rc.request().headers());
+
+        LOGGER.infof("Filters Match: %s to %s", rc.normalizedPath(), pathFiltersMap.get(rc.normalizedPath()));
+        //rc.put("queryParams", rc.queryParams());
+        rc.reroute(pathFiltersMap.get(rc.normalizedPath()));
+      }
+    }
+
+  public void setRedirectPaths(HashMap<String, String> urlsMap) {
+    LOGGER.debugf("KcRoutingRedirectsHandler: setRedirectPaths(%s) ",urlsMap);
+    this.urlsMap = urlsMap;
+  }
+  public void setPathPrefixes(HashMap<String, String> pathPrefixesMap) {
+    LOGGER.debugf("KcRoutingRedirectsHandler: setPathPrefixes(%s) ",pathPrefixesMap);
+    this.pathPrefixesMap = pathPrefixesMap;
+  }
+  public void setPathFilters(HashMap<String, String> pathFiltersMap) {
+    LOGGER.debugf("KcRoutingRedirectsHandler: setPathFilters(%s) ",pathFiltersMap);
+    this.pathFiltersMap = pathFiltersMap;
+  }
+
+  public void registerKcRoutingRedirectsFilter(@Observes Filters filters) {
+      filters.register(rc -> {
+          rc.response().putHeader("X-Header", "intercepting the request");
+          rc.next();
+      }, 100);
+  }
+}

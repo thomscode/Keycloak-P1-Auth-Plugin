@@ -9,5 +9,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'platform-one-sso'
+rootProject.name = "${rootProjectName}-empty"
+
+include 'p1-keycloak-plugin','quarkus-ext-routing-deployment','quarkus-ext-routing-runtime'
 
