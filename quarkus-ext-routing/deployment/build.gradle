@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     implementation platform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
-    implementation project(':quarkus-ext-routing-runtime')
+    implementation project(':runtime')
 
     implementation 'io.quarkus:quarkus-arc-deployment:2.12.3.Final'
     implementation 'io.quarkus:quarkus-vertx-http-deployment:2.12.3.Final'

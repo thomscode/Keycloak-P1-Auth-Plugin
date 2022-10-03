@@ -11,7 +11,7 @@ repositories {
     gradlePluginPortal()
 }
 
-subprojects.each { subproject -> evaluationDependsOn(subproject.path)}
+subprojects.each { subproject -> evaluationDependsOn(subproject.name)}
 
 task allJar(type: Jar, dependsOn: subprojects.jar) {
     duplicatesStrategy = 'include'

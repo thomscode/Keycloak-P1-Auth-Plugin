@@ -1,5 +1,4 @@
 package dod.p1.kc.routing.redirects.runtime;
-import dod.p1.kc.routing.redirects.runtime.KcRoutingRedirectsHandler;
 
 import io.quarkus.runtime.annotations.Recorder;
 import org.jboss.logging.Logger;

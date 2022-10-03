@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import org.jboss.logging.Logger;
 
-import io.quarkus.deployment.Feature;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.ExecutionTime;
