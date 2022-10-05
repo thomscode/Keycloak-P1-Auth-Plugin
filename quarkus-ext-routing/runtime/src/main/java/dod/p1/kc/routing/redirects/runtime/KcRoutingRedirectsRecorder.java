@@ -45,29 +45,29 @@ public class KcRoutingRedirectsRecorder {
       }
     }
 
-    /**
-     *
-     * @param pathPrefixesMap
-     */
-    public void setPathPrefixes(final HashMap<String, String> pathPrefixesMap) {
-      LOGGER.debugf("KcRoutingRedirectsRecorder.setPathPrefixes(%s) ", pathPrefixesMap);
-      if (handler != null) {
-        handler.setPathPrefixes(pathPrefixesMap);
-      } else {
-        LOGGER.debug("KcRoutingRedirectsRecorder.setPathPrefixes(null)");
-      }
-    }
-
-    /**
-     *
-     * @param pathFiltersMap
-     */
-    public void setPathFilters(final HashMap<String, String> pathFiltersMap) {
-      LOGGER.debugf("KcRoutingRedirectsRecorder.pathFiltersMap(%s) ", pathFiltersMap);
-      if (handler != null) {
-        handler.setPathFilters(pathFiltersMap);
-      } else {
-        LOGGER.debug("KcRoutingRedirectsRecorder.setPathFiltersMap(null)");
-      }
-    }
+//    /**
+//     *
+//     * @param pathPrefixesMap
+//     */
+//    public void setPathPrefixes(final HashMap<String, String> pathPrefixesMap) {
+//      LOGGER.debugf("KcRoutingRedirectsRecorder.setPathPrefixes(%s) ", pathPrefixesMap);
+//      if (handler != null) {
+//        handler.setPathPrefixes(pathPrefixesMap);
+//      } else {
+//        LOGGER.debug("KcRoutingRedirectsRecorder.setPathPrefixes(null)");
+//      }
+//    }
+//
+//    /**
+//     *
+//     * @param pathFiltersMap
+//     */
+//    public void setPathFilters(final HashMap<String, String> pathFiltersMap) {
+//      LOGGER.debugf("KcRoutingRedirectsRecorder.pathFiltersMap(%s) ", pathFiltersMap);
+//      if (handler != null) {
+//        handler.setPathFilters(pathFiltersMap);
+//      } else {
+//        LOGGER.debug("KcRoutingRedirectsRecorder.setPathFiltersMap(null)");
+//      }
+//    }
 }
