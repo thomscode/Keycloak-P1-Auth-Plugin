@@ -6,10 +6,20 @@ import java.util.HashMap;
 
 @Recorder
 public class KcRoutingRedirectsRecorder {
+
+    /**
+     * Declare logger.
+     */
     private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsRecorder.class.getName());
 
+    //CHECKSTYLE:OFF
     KcRoutingRedirectsHandler handler;
+    //CHECKSTYLE:ON
 
+    /**
+     *
+     * @return handler
+     */
     public KcRoutingRedirectsHandler getHandler() {
         if (handler == null) {
             LOGGER.debug("KcRoutingRedirectsRecorder: getHandler() Creating new handle");
@@ -21,16 +31,26 @@ public class KcRoutingRedirectsRecorder {
         }
 
     }
-    public void setRedirectPaths(HashMap<String, String> urlsMap) {
-      LOGGER.debugf("KcRoutingRedirectsRecorder.setRedirectPaths(%s) ",urlsMap);
+
+    /**
+     *
+     * @param urlsMap
+     */
+    public void setRedirectPaths(final HashMap<String, String> urlsMap) {
+      LOGGER.debugf("KcRoutingRedirectsRecorder.setRedirectPaths(%s) ", urlsMap);
       if (handler != null) {
         handler.setRedirectPaths(urlsMap);
       } else {
         LOGGER.debug("KcRoutingRedirectsRecorder.setRedirectPaths(null)");
       }
     }
-    public void setPathPrefixes(HashMap<String, String> pathPrefixesMap) {
-      LOGGER.debugf("KcRoutingRedirectsRecorder.setPathPrefixes(%s) ",pathPrefixesMap);
+
+    /**
+     *
+     * @param pathPrefixesMap
+     */
+    public void setPathPrefixes(final HashMap<String, String> pathPrefixesMap) {
+      LOGGER.debugf("KcRoutingRedirectsRecorder.setPathPrefixes(%s) ", pathPrefixesMap);
       if (handler != null) {
         handler.setPathPrefixes(pathPrefixesMap);
       } else {
@@ -38,8 +58,12 @@ public class KcRoutingRedirectsRecorder {
       }
     }
 
-    public void setPathFilters(HashMap<String, String> pathFiltersMap) {
-      LOGGER.debugf("KcRoutingRedirectsRecorder.pathFiltersMap(%s) ",pathFiltersMap);
+    /**
+     *
+     * @param pathFiltersMap
+     */
+    public void setPathFilters(final HashMap<String, String> pathFiltersMap) {
+      LOGGER.debugf("KcRoutingRedirectsRecorder.pathFiltersMap(%s) ", pathFiltersMap);
       if (handler != null) {
         handler.setPathFilters(pathFiltersMap);
       } else {

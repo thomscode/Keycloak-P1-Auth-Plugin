@@ -5,17 +5,24 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import io.quarkus.vertx.http.runtime.filters.Filters;
 
-//import io.quarkus.vertx.web.RouteFilter;
-import io.vertx.ext.web.RoutingContext;
 
 @ApplicationScoped
 public class KcRoutingRedirectsFilter {
 
-    public void registerKcRoutingRedirectsFilter(@Observes Filters filters) {
+    /**
+     * declare static final variable to ovoid checkstyle linting error.
+     */
+    private static final int FILTER_REGISTER_PRIORITY = 100;
+
+    /**
+     *
+     * @param filters
+     */
+    public void registerKcRoutingRedirectsFilter(@Observes final Filters filters) {
         filters.register(rc -> {
             rc.response().putHeader("X-Header", "intercepting the request");
             rc.next();
-        }, 100);
+        }, FILTER_REGISTER_PRIORITY);
     }
     // @RouteFilter
     // void myFilter(RoutingContext rc) {

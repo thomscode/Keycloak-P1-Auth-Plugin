@@ -11,13 +11,38 @@ import io.quarkus.vertx.http.runtime.filters.Filters;
 
 @ApplicationScoped
 public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
-  private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsHandler.class.getName());
-  private static HashMap<String, String> urlsMap = null;
-  private static HashMap<String, String> pathPrefixesMap = null;
-  private static HashMap<String, String> pathFiltersMap = null;
 
-  @Override
-  public void handle(RoutingContext rc) {
+    /**
+     * declare logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsHandler.class.getName());
+
+    /**
+     * declare static final variable to ovoid checkstyle linting error.
+     */
+    private static final int FILTER_REGISTER_PRIORITY = 100;
+
+    /**
+     * the urlsMap.
+     */
+    private static HashMap<String, String> urlsMap = null;
+
+    /**
+     * the pathPrefixesMap.
+     */
+    private static HashMap<String, String> pathPrefixesMap = null;
+
+    /**
+     * the pathFilterMap.
+     */
+    private static HashMap<String, String> pathFiltersMap = null;
+
+    /**
+     *
+     * @param rc  the event to handle
+     */
+    @Override
+    public void handle(final RoutingContext rc) {
 
       //Works but might be slow
       // urlsMap.forEach((k, v) -> {
@@ -54,23 +79,42 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
       }
     }
 
-  public void setRedirectPaths(HashMap<String, String> urlsMap) {
-    LOGGER.debugf("KcRoutingRedirectsHandler: setRedirectPaths(%s) ",urlsMap);
-    this.urlsMap = urlsMap;
-  }
-  public void setPathPrefixes(HashMap<String, String> pathPrefixesMap) {
-    LOGGER.debugf("KcRoutingRedirectsHandler: setPathPrefixes(%s) ",pathPrefixesMap);
-    this.pathPrefixesMap = pathPrefixesMap;
-  }
-  public void setPathFilters(HashMap<String, String> pathFiltersMap) {
-    LOGGER.debugf("KcRoutingRedirectsHandler: setPathFilters(%s) ",pathFiltersMap);
-    this.pathFiltersMap = pathFiltersMap;
-  }
+    /**
+     *
+     * @param argUrlsMap
+     */
+    public void setRedirectPaths(final HashMap<String, String> argUrlsMap) {
+    LOGGER.debugf("KcRoutingRedirectsHandler: setRedirectPaths(%s) ", urlsMap);
+    this.urlsMap = argUrlsMap;
+    }
 
-  public void registerKcRoutingRedirectsFilter(@Observes Filters filters) {
+    /**
+     *
+     * @param argPathPrefixesMap
+     */
+    public void setPathPrefixes(final HashMap<String, String> argPathPrefixesMap) {
+    LOGGER.debugf("KcRoutingRedirectsHandler: setPathPrefixes(%s) ", pathPrefixesMap);
+    this.pathPrefixesMap = argPathPrefixesMap;
+    }
+
+    /**
+     *
+     * @param argPathFiltersMap
+     */
+    public void setPathFilters(final HashMap<String, String> argPathFiltersMap) {
+    LOGGER.debugf("KcRoutingRedirectsHandler: setPathFilters(%s) ", pathFiltersMap);
+    this.pathFiltersMap = pathFiltersMap;
+    }
+
+    /**
+     *
+     * @param filters
+     */
+    public void registerKcRoutingRedirectsFilter(@Observes final Filters filters) {
       filters.register(rc -> {
           rc.response().putHeader("X-Header", "intercepting the request");
           rc.next();
-      }, 100);
-  }
+      }, FILTER_REGISTER_PRIORITY);
+    }
+
 }

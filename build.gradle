@@ -1,5 +1,6 @@
 plugins {
     id 'groovy-gradle-plugin'
+//    id 'checkstyle'
 }
 
 group = "${rootProjectgroupId}"
@@ -11,7 +12,9 @@ repositories {
     gradlePluginPortal()
 }
 
-subprojects.each { subproject -> evaluationDependsOn(subproject.name)}
+subprojects.each {
+subproject -> evaluationDependsOn(subproject.name)
+}
 
 task allJar(type: Jar, dependsOn: subprojects.jar) {
     duplicatesStrategy = 'include'
@@ -28,3 +31,46 @@ artifacts {
 }
 
 description = 'Keycloak Plugin Parent'
+
+
+// https://stackoverflow.com/questions/57803277/run-checkstyles-in-subprojects-before-all-tests-in-all-subprojects
+// Create a lifecycle task in the root project.
+// make this depend on all checkstyle tasks from subprojects (see below)
+def checkstyleAllTask = task("checkstyleAll")
+
+// register task "listGradle" for CI pipeline
+tasks.register('lintGradle') {
+    dependsOn checkstyleAll
+}
+
+// Make 'lintGradle' task depend on lifecycle task
+lintGradle.dependsOn(checkstyleAllTask)
+
+subprojects {
+    apply plugin: "checkstyle"
+
+    // ignore all lint errors for test code
+    checkstyleTest.exclude('**/**')
+
+    checkstyle {
+        toolVersion = '8.29'
+        ignoreFailures = false
+        showViolations = true
+    }
+
+    // Ensure all checkstyle tasks are a dependency of the "checkstyleAll" task
+    checkstyleAllTask.dependsOn(tasks.withType(Checkstyle))
+
+    tasks.withType(Test) {
+        // Indicate that testing tasks should run after the "checkstyleAll" task
+        shouldRunAfter(checkstyleAllTask)
+
+        // Indicate that testing tasks should run after any checksytle tasks.
+        // This is useful for when you only want to run an individual
+        // subproject's checks (e.g. ./gradlew ::subprojA::check)
+        shouldRunAfter(tasks.withType(Checkstyle))
+    }
+
+}
+
+

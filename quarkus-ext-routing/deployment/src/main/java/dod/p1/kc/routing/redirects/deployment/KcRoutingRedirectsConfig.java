@@ -14,9 +14,11 @@ public class KcRoutingRedirectsConfig {
      * The value `/` is not allowed as it blocks the application from serving anything else.
      * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
      */
-    @ConfigItem
-    Map<String, String> urls;
 
+    @ConfigItem
+    //CHECKSTYLE:OFF
+    Map<String, String> urls;
+    //CHECKSTYLE:ON
 
     /**
      * The path where KC Prefixes Redirects are available.
@@ -24,8 +26,10 @@ public class KcRoutingRedirectsConfig {
      * The value `/` is not allowed as it blocks the application from serving anything else.
      * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
      */
-    @ConfigItem()
+    @ConfigItem
+    //CHECKSTYLE:OFF
     Map<String, String> pathPrefixes;
+    //CHECKSTYLE:ON
 
     /**
      * The path where KC filters is available.
@@ -33,14 +37,17 @@ public class KcRoutingRedirectsConfig {
      * The value `/` is not allowed as it blocks the application from serving anything else.
      * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
      */
-    @ConfigItem()
+    @ConfigItem
+    //CHECKSTYLE:OFF
     Map<String, String> pathFilters;
+    //CHECKSTYLE:ON
 
     /**
      * If this should be included every time. By default, this is only included when the application is running
      * in dev mode.
      */
     @ConfigItem(defaultValue = "false")
+    //CHECKSTYLE:OFF
     boolean alwaysInclude;
-
+    //CHECKSTYLE:ON
 }

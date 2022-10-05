@@ -14,25 +14,44 @@ import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 
 public class KcRoutingRedirectsProcessor {
+
+    /**
+     * Define logger.
+     */
     private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsProcessor.class);
+
+    /**
+     * Name of feature required for quarkus build augmentation phase.
+     */
     private static final String FEATURE = "kc-routing-redirects";
 
 
+    /**
+     *
+     * @return newFeatureBuildItem()
+     */
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
     }
 
+    /**
+     *
+     * @param recorder
+     * @param routes
+     * @param nonApplicationRootPathBuildItem
+     * @param kcRoutingRedirectsConfig
+     */
     @BuildStep
     @Record(ExecutionTime.STATIC_INIT)
-    public void registerKcRoutingRedirectsHandler(KcRoutingRedirectsRecorder recorder,
-            BuildProducer<RouteBuildItem> routes,
-            NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
-            KcRoutingRedirectsConfig KcRoutingRedirectsConfig) {
+    public void registerKcRoutingRedirectsHandler(final KcRoutingRedirectsRecorder recorder,
+            final BuildProducer<RouteBuildItem> routes,
+            final NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
+            final KcRoutingRedirectsConfig kcRoutingRedirectsConfig) {
 
-        HashMap<String, String> urlsMap = new HashMap<String, String>(KcRoutingRedirectsConfig.urls);
-        HashMap<String, String> pathPrefixesMap = new HashMap<String, String>(KcRoutingRedirectsConfig.pathPrefixes);
-        HashMap<String, String> pathFiltersMap = new HashMap<String, String>(KcRoutingRedirectsConfig.pathFilters);
+        HashMap<String, String> urlsMap = new HashMap<String, String>(kcRoutingRedirectsConfig.urls);
+        HashMap<String, String> pathPrefixesMap = new HashMap<String, String>(kcRoutingRedirectsConfig.pathPrefixes);
+        HashMap<String, String> pathFiltersMap = new HashMap<String, String>(kcRoutingRedirectsConfig.pathFilters);
 
 
         urlsMap.forEach((k, v) -> {
