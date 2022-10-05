@@ -16,9 +16,14 @@ subprojects.each {
 subproject -> evaluationDependsOn(subproject.name)
 }
 
+jar {
+    // disable the default jar task. A multi project jar is built with allJar task
+    enabled = false
+}
+
 task allJar(type: Jar, dependsOn: subprojects.jar) {
     duplicatesStrategy = 'include'
-    baseName = "${rootProjectName}-parent"
+    baseName = "${rootProjectName}"
     subprojects.each { subproject ->
         from subproject.configurations.archives.allArtifacts.files.collect {
             zipTree(it)

@@ -1,4 +1,4 @@
-rootProject.name = "${rootProjectName}-empty"
+rootProject.name = "${rootProjectName}"
 
 include 'p1-keycloak-plugin','deployment','runtime'
 project(':deployment').projectDir = file('quarkus-ext-routing/deployment')
