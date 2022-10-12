@@ -20,28 +20,6 @@ public class KcRoutingRedirectsConfig {
     Map<String, String> urls;
     //CHECKSTYLE:ON
 
-//    /**
-//     * The path where KC Prefixes Redirects are available.
-//     * <p>
-//     * The value `/` is not allowed as it blocks the application from serving anything else.
-//     * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
-//     */
-//    @ConfigItem
-//    //CHECKSTYLE:OFF
-//    Map<String, String> pathPrefixes;
-//    //CHECKSTYLE:ON
-//
-//    /**
-//     * The path where KC filters is available.
-//     * <p>
-//     * The value `/` is not allowed as it blocks the application from serving anything else.
-//     * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
-//     */
-//    @ConfigItem
-//    //CHECKSTYLE:OFF
-//    Map<String, String> pathFilters;
-//    //CHECKSTYLE:ON
-
     /**
      * If this should be included every time. By default, this is only included when the application is running
      * in dev mode.
