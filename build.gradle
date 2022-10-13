@@ -1,6 +1,5 @@
 plugins {
     id 'groovy-gradle-plugin'
-//    id 'checkstyle'
 }
 
 group = "${rootProjectgroupId}"
@@ -52,6 +51,8 @@ tasks.register('lintGradle') {
 lintGradle.dependsOn(checkstyleAllTask)
 
 subprojects {
+
+    //CHECKSTYLE
     apply plugin: "checkstyle"
 
     // ignore all lint errors for test code
@@ -78,4 +79,10 @@ subprojects {
 
 }
 
-
+allprojects {
+    //DEPENDENCYCHECK
+    apply plugin: "org.owasp.dependencycheck"
+    dependencyCheck {
+        format = "ALL"
+    }
+}
