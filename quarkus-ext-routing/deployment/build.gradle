@@ -21,6 +21,8 @@ dependencies {
     implementation 'io.quarkus:quarkus-arc-deployment:2.12.3.Final'
     implementation 'io.quarkus:quarkus-vertx-http-deployment:2.12.3.Final'
 
+    testImplementation 'org.springframework:spring-context:3.0.1.RELEASE'
+    testImplementation 'io.quarkus:quarkus-reactive-routes:2.12.3.Final'
     testImplementation 'io.quarkus:quarkus-junit5-internal'
     testImplementation 'io.rest-assured:rest-assured'
 }

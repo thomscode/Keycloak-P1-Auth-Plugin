@@ -50,6 +50,9 @@ public class KcRoutingRedirectsProcessor {
             final KcRoutingRedirectsConfig kcRoutingRedirectsConfig) {
 
         HashMap<String, String> urlsMap = new HashMap<>(kcRoutingRedirectsConfig.urls);
+        HashMap<String, String> pathPrefixesMap = new HashMap<>(kcRoutingRedirectsConfig.pathPrefixes);
+        HashMap<String, String> pathFiltersMap = new HashMap<>(kcRoutingRedirectsConfig.pathFilters);
+
 
         urlsMap.forEach((k, v) -> {
           LOGGER.infof("Creating Redirect Route: %s %s", k, v);
@@ -60,5 +63,22 @@ public class KcRoutingRedirectsProcessor {
         });
         recorder.setRedirectPaths(urlsMap);
 
-    }
+        pathPrefixesMap.forEach((k, v) -> {
+          LOGGER.infof("Creating pathPrefix Route: %s %s", k, v);
+          routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
+                  .route(k + "/*")
+                  .handler(recorder.getHandler())
+                  .build());
+        });
+        recorder.setPathPrefixes(pathPrefixesMap);
+
+        pathFiltersMap.forEach((k, v) -> {
+          LOGGER.infof("Creating pathFilters Route: %s %s", k, v);
+          routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
+                  .route(k)
+                  .handler(recorder.getHandler())
+                  .build());
+        });
+        recorder.setPathFilters(pathFiltersMap);
+  }
 }
