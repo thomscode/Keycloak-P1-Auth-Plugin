@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'jacoco'
 }
 
 group "${rootProjectgroupId}"
@@ -30,4 +31,19 @@ dependencies {
 test {
     useJUnitPlatform()
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDirectory = file("${buildDir}/jacoco")
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        html.destination file("${buildDir}/jacoco/html/")
+        csv.enabled false
+        xml.enabled true
+        xml.destination file("${buildDir}/jacoco/test.xml")
+    }
 }

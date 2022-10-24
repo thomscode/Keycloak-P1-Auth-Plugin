@@ -1,5 +1,6 @@
 plugins {
     id 'groovy-gradle-plugin'
+    id 'jacoco'
 }
 
 group = "${rootProjectgroupId}"
@@ -86,3 +87,38 @@ allprojects {
         format = "ALL"
     }
 }
+
+task jacocoMergeAll(type: JacocoMerge) {
+    dependsOn(subprojects.test, subprojects.jacocoTestReport)
+    subprojects.each { subproject ->
+        // exclude runtime subproject because there is no integration tests
+        if (subproject.name != 'runtime') {
+            executionData subproject.tasks.withType(Test)
+        }
+    }
+}
+
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    description = 'Generates an aggregate report from all subprojects'
+    dependsOn(jacocoMergeAll)
+
+    additionalSourceDirs.from =
+            files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories.from =
+            files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.from =
+            files(subprojects.sourceSets.main.output)
+    executionData.from =
+            files("${buildDir}/jacoco/jacocoMergeAll.exec")
+
+    reports {
+        html.enabled true
+        html.destination file("${buildDir}/jacoco/html/")
+        csv.enabled false
+        xml.enabled true
+        xml.destination file("${buildDir}/jacoco/test.xml")
+    }
+}
+
+// make jacocoRootReport run after jacocoTestReport
+jacocoTestReport.finalizedBy(jacocoRootReport)
