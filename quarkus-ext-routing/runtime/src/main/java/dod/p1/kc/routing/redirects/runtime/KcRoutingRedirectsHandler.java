@@ -35,9 +35,10 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
       * @param map the map to test for Null or Empty
       * @return true if map is null or empty
      */
-    public static boolean isNullOrEmptyMap(final HashMap<?, ?> map) {
+    public static boolean isNullOrEmptyMap(final Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
+
     /**
      *
      * @param rc the event to handle
@@ -88,7 +89,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      *
      * @param argpathPrefixesMap
      */
-    public void setPathPrefixes(final HashMap<String, String> argpathPrefixesMap) {
+    public static void setPathPrefixes(final Map<String, String> argpathPrefixesMap) {
       LOGGER.debugf("KcRoutingRedirectsHandler: setPathPrefixes(%s) ", argpathPrefixesMap);
       pathPrefixesMap = (HashMap<String, String>) argpathPrefixesMap;
     }
@@ -96,7 +97,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      *
      * @param argpathFiltersMap
      */
-    public void setPathFilters(final HashMap<String, String> argpathFiltersMap) {
+    public static void setPathFilters(final Map<String, String> argpathFiltersMap) {
       LOGGER.debugf("KcRoutingRedirectsHandler: setPathFilters(%s) ", argpathFiltersMap);
       pathFiltersMap = (HashMap<String, String>) argpathFiltersMap;
 

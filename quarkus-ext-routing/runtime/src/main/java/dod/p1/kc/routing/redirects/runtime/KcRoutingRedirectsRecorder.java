@@ -2,7 +2,7 @@ package dod.p1.kc.routing.redirects.runtime;
 
 import io.quarkus.runtime.annotations.Recorder;
 import org.jboss.logging.Logger;
-import java.util.HashMap;
+import java.util.Map;
 
 @Recorder
 public class KcRoutingRedirectsRecorder {
@@ -36,7 +36,7 @@ public class KcRoutingRedirectsRecorder {
      *
      * @param urlsMap
      */
-    public void setRedirectPaths(final HashMap<String, String> urlsMap) {
+    public void setRedirectPaths(final Map<String, String> urlsMap) {
       LOGGER.debugf("KcRoutingRedirectsRecorder.setRedirectPaths(%s) ", urlsMap);
       if (handler != null) {
         KcRoutingRedirectsHandler.setRedirectPaths(urlsMap);
@@ -49,10 +49,10 @@ public class KcRoutingRedirectsRecorder {
      *
      * @param pathPrefixesMap
      */
-    public void setPathPrefixes(final HashMap<String, String> pathPrefixesMap) {
+    public void setPathPrefixes(final Map<String, String> pathPrefixesMap) {
       LOGGER.debugf("KcRoutingRedirectsRecorder.setPathPrefixes(%s) ", pathPrefixesMap);
       if (handler != null) {
-        handler.setPathPrefixes(pathPrefixesMap);
+        KcRoutingRedirectsHandler.setPathPrefixes(pathPrefixesMap);
       } else {
         LOGGER.debug("KcRoutingRedirectsRecorder.setPathPrefixes(null)");
       }
@@ -62,10 +62,10 @@ public class KcRoutingRedirectsRecorder {
      *
      * @param pathFiltersMap
      */
-    public void setPathFilters(final HashMap<String, String> pathFiltersMap) {
+    public void setPathFilters(final Map<String, String> pathFiltersMap) {
       LOGGER.debugf("KcRoutingRedirectsRecorder.pathFiltersMap(%s) ", pathFiltersMap);
       if (handler != null) {
-        handler.setPathFilters(pathFiltersMap);
+        KcRoutingRedirectsHandler.setPathFilters(pathFiltersMap);
       } else {
         LOGGER.debug("KcRoutingRedirectsRecorder.setPathFiltersMap(null)");
       }
