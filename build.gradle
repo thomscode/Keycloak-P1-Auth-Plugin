@@ -78,6 +78,9 @@ subprojects {
         shouldRunAfter(tasks.withType(Checkstyle))
     }
 
+    // help with dependency tree research
+    // ./gradlew allDeps
+    task allDeps(type: DependencyReportTask) {}
 }
 
 allprojects {
