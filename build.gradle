@@ -110,7 +110,7 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
             files(subprojects.sourceSets.main.output)
     executionData.from =
             files("${buildDir}/jacoco/jacocoMergeAll.exec")
-
+    dependencyCheckAggregate
     reports {
         html.enabled true
         html.destination file("${buildDir}/jacoco/html/")
@@ -122,3 +122,6 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 
 // make jacocoRootReport run after jacocoTestReport
 jacocoTestReport.finalizedBy(jacocoRootReport)
+
+// aggregate dependencyCheck reports
+dependencyCheckAnalyze.finalizedBy(dependencyCheckAggregate)
