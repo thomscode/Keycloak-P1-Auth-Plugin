@@ -27,6 +27,7 @@ import org.keycloak.services.clientpolicy.ClientPolicyManager;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.AuthenticationSessionProvider;
 import org.keycloak.storage.federated.UserFederatedStorageProvider;
+import org.keycloak.storage.*;
 import org.keycloak.vault.VaultTranscriber;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -335,7 +336,7 @@ public class RegistrationValidationTest {
                         return null;
                     }
 
-                    @Override
+                    //@Override
                     public UserFederatedStorageProvider userFederatedStorage() {
                         return null;
                     }

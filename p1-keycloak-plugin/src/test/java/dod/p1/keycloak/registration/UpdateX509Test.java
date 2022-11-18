@@ -1,4 +1,5 @@
 package dod.p1.keycloak.registration;
+import org.keycloak.*;
 
 import dod.p1.keycloak.utils.NewObjectProvider;
 import dod.p1.keycloak.utils.Utils;
@@ -10,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.keycloak.Config;
 import org.keycloak.authentication.RequiredActionContext;
-import org.keycloak.authentication.authenticators.x509.UserIdentityExtractor;
+import org.keycloak.common.crypto.*;
 import org.keycloak.authentication.authenticators.x509.X509AuthenticatorConfigModel;
 import org.keycloak.authentication.authenticators.x509.X509ClientCertificateAuthenticator;
 import org.keycloak.forms.login.LoginFormsProvider;
@@ -112,6 +113,8 @@ class UpdateX509Test {
                 .thenAnswer((stream) -> {
                     return Stream.of(userModel);
                 });
+
+        CryptoIntegration.init(this.getClass().getClassLoader());
     }
 
     @Test

@@ -1,4 +1,5 @@
 package dod.p1.keycloak.registration;
+import org.keycloak.*;
 
 import dod.p1.keycloak.utils.NewObjectProvider;
 import dod.p1.keycloak.utils.Utils;
@@ -9,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.keycloak.authentication.ValidationContext;
-import org.keycloak.authentication.authenticators.x509.UserIdentityExtractor;
+import org.keycloak.common.crypto.*;
 import org.keycloak.authentication.authenticators.x509.X509AuthenticatorConfigModel;
 import org.keycloak.authentication.authenticators.x509.X509ClientCertificateAuthenticator;
 import org.keycloak.models.*;
@@ -81,6 +82,7 @@ class X509ToolsTest {
         PowerMockito.when(validationContext.getHttpRequest()).thenReturn(httpRequest);
         PowerMockito.when(validationContext.getRealm()).thenReturn(realmModel);
 
+        CryptoIntegration.init(this.getClass().getClassLoader());
     }
 
     @Test
