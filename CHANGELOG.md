@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Upgrade Keycloak to version 20.0.1
 ### Added
 - Added Quarkus custom extension for routing redirects
- 
+
 ## [2.0.10] - 2022-08-11
 ### Updated
 - Fix sonar findings
