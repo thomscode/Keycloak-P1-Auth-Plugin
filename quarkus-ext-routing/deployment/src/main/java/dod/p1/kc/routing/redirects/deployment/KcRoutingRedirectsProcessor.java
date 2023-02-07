@@ -52,10 +52,11 @@ public class KcRoutingRedirectsProcessor {
         HashMap<String, String> urlsMap = new HashMap<>(kcRoutingRedirectsConfig.urls);
         HashMap<String, String> pathPrefixesMap = new HashMap<>(kcRoutingRedirectsConfig.pathPrefixes);
         HashMap<String, String> pathFiltersMap = new HashMap<>(kcRoutingRedirectsConfig.pathFilters);
-
+        HashMap<String, String> pathBlocksMap = new HashMap<>(kcRoutingRedirectsConfig.pathBlocks);
+        HashMap<String, String> pathAllowsMap = new HashMap<>(kcRoutingRedirectsConfig.pathAllows);
 
         urlsMap.forEach((k, v) -> {
-          LOGGER.infof("Creating Redirect Route: %s %s", k, v);
+          LOGGER.infof("Creating Redirect Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(k)
                   .handler(recorder.getHandler())
@@ -64,7 +65,7 @@ public class KcRoutingRedirectsProcessor {
         recorder.setRedirectPaths(urlsMap);
 
         pathPrefixesMap.forEach((k, v) -> {
-          LOGGER.infof("Creating pathPrefix Route: %s %s", k, v);
+          LOGGER.infof("Creating Prefix Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(k + "/*")
                   .handler(recorder.getHandler())
@@ -73,12 +74,30 @@ public class KcRoutingRedirectsProcessor {
         recorder.setPathPrefixes(pathPrefixesMap);
 
         pathFiltersMap.forEach((k, v) -> {
-          LOGGER.infof("Creating pathFilters Route: %s %s", k, v);
+          LOGGER.infof("Creating Filters Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(k)
                   .handler(recorder.getHandler())
                   .build());
         });
         recorder.setPathFilters(pathFiltersMap);
+
+        pathBlocksMap.forEach((k, v) -> {
+          LOGGER.infof("Creating Blocks Routes: %s %s", k, v);
+          routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
+                  .route(k)
+                  .handler(recorder.getHandler())
+                  .build());
+        });
+        recorder.setPathBlocks(pathBlocksMap);
+
+        pathAllowsMap.forEach((k, v) -> {
+          LOGGER.infof("Creating Allows Routes: %s %s", k, v);
+          routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
+                  .route(k)
+                  .handler(recorder.getHandler())
+                  .build());
+        });
+        recorder.setPathAllows(pathAllowsMap);
   }
 }

@@ -70,4 +70,30 @@ public class KcRoutingRedirectsRecorder {
         LOGGER.debug("KcRoutingRedirectsRecorder.setPathFiltersMap(null)");
       }
     }
+
+    /**
+     *
+     * @param pathBlocksMap
+     */
+    public void setPathBlocks(final Map<String, String> pathBlocksMap) {
+      LOGGER.debugf("KcRoutingRedirectsRecorder.pathBlocksMap(%s) ", pathBlocksMap);
+      if (handler != null) {
+        KcRoutingRedirectsHandler.setPathBlocks(pathBlocksMap);
+      } else {
+        LOGGER.debug("KcRoutingRedirectsRecorder.setpathBlocksMap(null)");
+      }
+    }
+
+    /**
+     *
+     * @param pathAllowsMap
+     */
+    public void setPathAllows(final Map<String, String> pathAllowsMap) {
+      LOGGER.debugf("KcRoutingRedirectsRecorder.pathAllowsMap(%s) ", pathAllowsMap);
+      if (handler != null) {
+        KcRoutingRedirectsHandler.setPathAllows(pathAllowsMap);
+      } else {
+        LOGGER.debug("KcRoutingRedirectsRecorder.setpathAllowsMap(null)");
+      }
+    }
 }

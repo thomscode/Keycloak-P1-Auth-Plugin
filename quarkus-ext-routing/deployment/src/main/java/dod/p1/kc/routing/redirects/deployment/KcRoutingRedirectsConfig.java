@@ -42,6 +42,28 @@ public class KcRoutingRedirectsConfig {
     //CHECKSTYLE:ON
 
     /**
+     * Map of dest ports to uri paths to block.
+     * <p>
+     * Example: Block /metrics on port 8443 - quarkus.kc-routing-redirects.path-block.8443=/metrics
+     * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
+     */
+    @ConfigItem()
+    //CHECKSTYLE:OFF
+    Map<String, String> pathBlocks;
+    //CHECKSTYLE:ON
+
+    /**
+     * Map of source IPs to uri paths to allow superseding blocks.
+     * <p>
+     * Example: Allow /metrics on for source CIDR 10.42.0.0 - quarkus.kc-routing-redirects.path-block.8443=/metrics
+     * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
+     */
+    @ConfigItem()
+    //CHECKSTYLE:OFF
+    Map<String, String> pathAllows;
+    //CHECKSTYLE:ON
+
+    /**
      * If this should be included every time. By default, this is only included when the application is running
      * in dev mode.
      */
