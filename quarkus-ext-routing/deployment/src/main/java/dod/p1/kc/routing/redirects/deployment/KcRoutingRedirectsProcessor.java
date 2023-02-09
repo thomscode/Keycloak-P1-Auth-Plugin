@@ -74,7 +74,7 @@ public class KcRoutingRedirectsProcessor {
         recorder.setPathPrefixes(pathPrefixesMap);
 
         pathFiltersMap.forEach((k, v) -> {
-          LOGGER.infof("Creating Filters Routes: %s %s", k, v);
+          LOGGER.infof("Creating Filter Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(k)
                   .handler(recorder.getHandler())
@@ -83,7 +83,7 @@ public class KcRoutingRedirectsProcessor {
         recorder.setPathFilters(pathFiltersMap);
 
         pathBlocksMap.forEach((k, v) -> {
-          LOGGER.infof("Creating Blocks Routes: %s %s", k, v);
+          LOGGER.infof("Creating Block Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(k)
                   .handler(recorder.getHandler())
@@ -92,7 +92,7 @@ public class KcRoutingRedirectsProcessor {
         recorder.setPathBlocks(pathBlocksMap);
 
         pathAllowsMap.forEach((k, v) -> {
-          LOGGER.infof("Creating Allows Routes: %s %s", k, v);
+          LOGGER.infof("Creating Allow Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(k)
                   .handler(recorder.getHandler())
