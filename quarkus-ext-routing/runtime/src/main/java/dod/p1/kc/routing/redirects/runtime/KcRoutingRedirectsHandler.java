@@ -126,7 +126,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
       if (!isNullOrEmptyMap(pathPrefixesMap)) {
         pathPrefixesMap.forEach((k, v) -> {
           if (rc.normalizedPath().startsWith(k)) {
-              LOGGER.debugf("PathPrefixing Match: %s to %s", k, v);
+              LOGGER.debugf("Prefix Match: %s to %s", k, v);
               LOGGER.debugf("uri before: %s", rc.request().uri());
               rc.redirect(rc.request().uri().replace(k, v));
               LOGGER.debugf("uri after: %s", rc.request().uri().replace(k, v));
@@ -141,7 +141,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
     private static void PathFiltersHandler(final RoutingContext rc) {
       LOGGER.debugf("KcRoutingRedirectsHandler: PathFiltersHandler(%s)");
       if (!isNullOrEmptyMap(pathFiltersMap) && pathFiltersMap.containsKey(rc.normalizedPath())) {
-        LOGGER.debugf("Filters Match: %s to %s", rc.normalizedPath(), pathFiltersMap.get(rc.normalizedPath()));
+        LOGGER.debugf("Filter Match: %s to %s", rc.normalizedPath(), pathFiltersMap.get(rc.normalizedPath()));
         LOGGER.debugf("uri before: %s", rc.request().uri());
 
         if (rc.request().query() != null) {
