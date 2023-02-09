@@ -16,7 +16,7 @@ public class KcRoutingRedirectsConfig {
      */
     @ConfigItem
     //CHECKSTYLE:OFF
-    Map<String, String> urls;
+    Map<String, String> pathRedirects;
     //CHECKSTYLE:ON
 
     /**

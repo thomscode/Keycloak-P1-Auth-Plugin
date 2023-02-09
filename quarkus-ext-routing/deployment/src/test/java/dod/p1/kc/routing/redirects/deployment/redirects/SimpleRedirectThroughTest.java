@@ -26,9 +26,9 @@ public class SimpleRedirectThroughTest {
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
                   // We need a real path that root points to for follows to work
-                  "quarkus.kc-routing-redirects.urls./Follow1=/TestWebServer\n" +
-                  "quarkus.kc-routing-redirects.urls./Follow2/SubPath=/TestWebServer\n" +
-                  "quarkus.kc-routing-redirects.urls./Follow3=/DoesNotExist\n"),
+                  "quarkus.kc-routing-redirects.path-redirects./Follow1=/TestWebServer\n" +
+                  "quarkus.kc-routing-redirects.path-redirects./Follow2/SubPath=/TestWebServer\n" +
+                  "quarkus.kc-routing-redirects.path-redirects./Follow3=/DoesNotExist\n"),
                   "application.properties"));
 
   @Route(path = "TestWebServer")

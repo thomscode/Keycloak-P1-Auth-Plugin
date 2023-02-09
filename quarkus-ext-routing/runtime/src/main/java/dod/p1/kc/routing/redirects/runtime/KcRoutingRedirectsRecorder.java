@@ -34,14 +34,14 @@ public class KcRoutingRedirectsRecorder {
 
     /**
      *
-     * @param urlsMap
+     * @param pathRedirectsMap
      */
-    public void setRedirectPaths(final Map<String, String> urlsMap) {
-      LOGGER.debugf("KcRoutingRedirectsRecorder.setRedirectPaths(%s) ", urlsMap);
+    public void setPathRedirects(final Map<String, String> pathRedirectsMap) {
+      LOGGER.debugf("KcRoutingRedirectsRecorder.setPathRedirects(%s) ", pathRedirectsMap);
       if (handler != null) {
-        KcRoutingRedirectsHandler.setRedirectPaths(urlsMap);
+        KcRoutingRedirectsHandler.setPathRedirects(pathRedirectsMap);
       } else {
-        LOGGER.debug("KcRoutingRedirectsRecorder.setRedirectPaths(null)");
+        LOGGER.debug("KcRoutingRedirectsRecorder.setPathRedirects(null)");
       }
     }
 

@@ -49,20 +49,20 @@ public class KcRoutingRedirectsProcessor {
             final NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
             final KcRoutingRedirectsConfig kcRoutingRedirectsConfig) {
 
-        HashMap<String, String> urlsMap = new HashMap<>(kcRoutingRedirectsConfig.urls);
+        HashMap<String, String> pathRedirectsMap = new HashMap<>(kcRoutingRedirectsConfig.pathRedirects);
         HashMap<String, String> pathPrefixesMap = new HashMap<>(kcRoutingRedirectsConfig.pathPrefixes);
         HashMap<String, String> pathFiltersMap = new HashMap<>(kcRoutingRedirectsConfig.pathFilters);
         HashMap<String, String> pathBlocksMap = new HashMap<>(kcRoutingRedirectsConfig.pathBlocks);
         HashMap<String, String> pathAllowsMap = new HashMap<>(kcRoutingRedirectsConfig.pathAllows);
 
-        urlsMap.forEach((k, v) -> {
+        pathRedirectsMap.forEach((k, v) -> {
           LOGGER.infof("Creating Redirect Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(k)
                   .handler(recorder.getHandler())
                   .build());
         });
-        recorder.setRedirectPaths(urlsMap);
+        recorder.setPathRedirects(pathRedirectsMap);
 
         pathPrefixesMap.forEach((k, v) -> {
           LOGGER.infof("Creating Prefix Routes: %s %s", k, v);

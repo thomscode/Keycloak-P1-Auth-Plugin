@@ -24,9 +24,9 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
     private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsHandler.class.getName());
 
     /**
-     * the urlsMap.
+     * the pathRedirectsMap.
      */
-    private static HashMap<String, String> urlsMap = null;
+    private static HashMap<String, String> pathRedirectsMap = null;
     /**
      * the pathPrefixesMap.
      */
@@ -67,6 +67,32 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
     @Override
     public void handle(final RoutingContext rc) {
 
+      //Enable when adding new code for more debug output
+      //if (LOGGER.isDebugEnabled()) DebugHTTPHeaders(rc);
+      PathRedirectsHandler(rc);
+      PathPrefixesHandler(rc);
+      PathFiltersHandler(rc);
+      PathBlocksHandler(rc);
+
+    }
+    /**
+     * Check if IP is within CIDR range.
+     * @param  ip
+     * @param  subnet
+     * @return true if ip matches CIDR false if not
+     */
+    private static boolean matches(final String ip, final String subnet) {
+      //Option 2 allows us to bring in IpAddressMatcher class if we don't want to use dependency
+      //Link below should be put back together: https://stackoverflow.com/questions/577363/
+      //how-to-check-if-an-ip-address-is-from-a-particular-network-netmask-in-java
+        IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(subnet);
+        return ipAddressMatcher.matches(ip);
+    }
+    /**
+     * Debug output used for troubleshooting HTTP Headers
+     * @param rc
+     */
+    private static void DebugHTTPHeaders(final RoutingContext rc) {
       // Host = https for https and either http or none for http traffic
       //https://vertx.io/docs/apidocs/io/vertx/core/http/HttpServerRequest.html
       LOGGER.debugf("Uri %s", rc.request().uri());
@@ -79,12 +105,24 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
       LOGGER.debugf("Host:  %s", rc.request().host());
       LOGGER.debugf("isSSL: %s", rc.request().isSSL());
       LOGGER.debugf("Headers: \n%s", rc.request().headers());
-
-      if (!isNullOrEmptyMap(urlsMap) && urlsMap.containsKey(rc.normalizedPath())) {
-        LOGGER.debugf("Redirect Match: %s to %s", rc.normalizedPath(), urlsMap.get(rc.normalizedPath()));
-        rc.redirect(urlsMap.get(rc.normalizedPath()));
+    }
+    /**
+     * Handler for Redirects processing.
+     * @param rc
+     */
+    private static void PathRedirectsHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingRedirectsHandler: PathRedirectsHandler(%s)");
+      if (!isNullOrEmptyMap(pathRedirectsMap) && pathRedirectsMap.containsKey(rc.normalizedPath())) {
+        LOGGER.debugf("Redirect Match: %s to %s", rc.normalizedPath(), pathRedirectsMap.get(rc.normalizedPath()));
+        rc.redirect(pathRedirectsMap.get(rc.normalizedPath()));
       }
-
+    }
+    /**
+     * Handler for Prefixes processing.
+     * @param rc
+     */
+    private static void PathPrefixesHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingRedirectsHandler: PathPrefixesHandler(%s)");
       if (!isNullOrEmptyMap(pathPrefixesMap)) {
         pathPrefixesMap.forEach((k, v) -> {
           if (rc.normalizedPath().startsWith(k)) {
@@ -95,7 +133,13 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
           }
         });
       }
-
+    }
+    /**
+     * Handler for Fiilters processing.
+     * @param rc
+     */
+    private static void PathFiltersHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingRedirectsHandler: PathFiltersHandler(%s)");
       if (!isNullOrEmptyMap(pathFiltersMap) && pathFiltersMap.containsKey(rc.normalizedPath())) {
         LOGGER.debugf("Filters Match: %s to %s", rc.normalizedPath(), pathFiltersMap.get(rc.normalizedPath()));
         LOGGER.debugf("uri before: %s", rc.request().uri());
@@ -108,6 +152,13 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
             rc.reroute(pathFiltersMap.get(rc.normalizedPath()));
         }
       }
+    }
+    /**
+     * Handler for Blocks processing.
+     * @param rc
+     */
+    private static void PathBlocksHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingRedirectsHandler: PathBlocksHandler(%s)");
       if (!isNullOrEmptyMap(pathBlocksMap) && pathBlocksMap.containsKey(rc.normalizedPath())) {
         boolean whiteListFound = false;
 
@@ -159,28 +210,13 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
         }
       }
     }
-
-    /**
-     * Check if IP is within CIDR range.
-     * @param  ip
-     * @param  subnet
-     * @return true if ip matches CIDR false if not
-     */
-    private boolean matches(final String ip, final String subnet) {
-      //Option 2 allows us to bring in IpAddressMatcher class if we don't want to use dependency
-      //Link below should be put back together: https://stackoverflow.com/questions/577363/
-      //how-to-check-if-an-ip-address-is-from-a-particular-network-netmask-in-java
-        IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(subnet);
-        return ipAddressMatcher.matches(ip);
-    }
-
     /**
      *
-     * @param argUrlsMap
+     * @param argpathRedirectsMap
      */
-    public static void setRedirectPaths(final Map<String, String> argUrlsMap) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: setRedirectPaths(%s) ", argUrlsMap);
-      urlsMap = (HashMap<String, String>) argUrlsMap;
+    public static void setPathRedirects(final Map<String, String> argpathRedirectsMap) {
+      LOGGER.debugf("KcRoutingRedirectsHandler: setPathRedirects(%s) ", argpathRedirectsMap);
+      pathRedirectsMap = (HashMap<String, String>) argpathRedirectsMap;
     }
 
     /**
