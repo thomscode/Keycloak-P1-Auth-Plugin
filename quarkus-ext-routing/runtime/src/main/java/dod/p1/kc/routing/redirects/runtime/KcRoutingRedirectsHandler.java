@@ -68,7 +68,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
     public void handle(final RoutingContext rc) {
 
       //Enable when adding new code for more debug output
-      //if (LOGGER.isDebugEnabled()) DebugHTTPHeaders(rc);
+      if (LOGGER.isDebugEnabled()) DebugHTTPHeaders(rc);
       PathRedirectsHandler(rc);
       PathPrefixesHandler(rc);
       PathFiltersHandler(rc);
