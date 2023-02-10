@@ -160,7 +160,6 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
     private static void PathBlocksHandler(final RoutingContext rc) {
       LOGGER.debugf("KcRoutingRedirectsHandler: PathBlocksHandler(%s)");
       if (!isNullOrEmptyMap(pathBlocksMap) && pathBlocksMap.containsKey(rc.normalizedPath())) {
-        boolean whiteListFound = false;
 
         LOGGER.debugf("Blocks Match on Key/Path %s testing Value/Port for match to %s",
           rc.normalizedPath(), pathBlocksMap.get(rc.normalizedPath()));
@@ -168,22 +167,9 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
         if (!isNullOrEmptyMap(pathAllowsMap) && pathAllowsMap.containsKey(rc.normalizedPath())) {
           LOGGER.debugf("Allows Match on Key/Path %s testing Value/CIDR for match to %s",
           rc.normalizedPath(), pathAllowsMap.get(rc.normalizedPath()));
-
-          // There is an allow list to cross reference
-          String hostAddress = rc.request().localAddress().hostAddress();
-          String[] allowedCIDRs = pathAllowsMap.get(rc.normalizedPath()).split(",");
-          List<String> allowedCIDRsList = new ArrayList<String>();
-          allowedCIDRsList = Arrays.asList(allowedCIDRs);
-          LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
-          for (String i : allowedCIDRsList) {
-            if (matches(hostAddress, i)) {
-                LOGGER.debugf("Allow Match Found %s: Allowing Routing %s to next hop", i, rc.normalizedPath());
-                rc.next();
-                whiteListFound = true;
-            }
-          }
         }
-        if (!whiteListFound) {
+
+        if (!PathAllowsHandler(rc)) {
           // There is not an allow list to cross reference
           // Below keeps ports as strings
           String localPort = String.valueOf(rc.request().localAddress().port());
@@ -209,6 +195,26 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
           }
         }
       }
+    }
+    /**
+     * Handler for Allows processing.
+     * @param rc
+     */
+    private static boolean PathAllowsHandler(final RoutingContext rc) {
+      // There is an allow list to cross reference
+      String hostAddress = rc.request().localAddress().hostAddress();
+      String[] allowedCIDRs = pathAllowsMap.get(rc.normalizedPath()).split(",");
+      List<String> allowedCIDRsList = new ArrayList<String>();
+      allowedCIDRsList = Arrays.asList(allowedCIDRs);
+      LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
+      for (String i : allowedCIDRsList) {
+        if (matches(hostAddress, i)) {
+            LOGGER.debugf("Allow Match Found %s: Allowing Routing %s to next hop", i, rc.normalizedPath());
+            rc.next();
+            return true;
+        }
+      }
+      return false;
     }
     /**
      *
