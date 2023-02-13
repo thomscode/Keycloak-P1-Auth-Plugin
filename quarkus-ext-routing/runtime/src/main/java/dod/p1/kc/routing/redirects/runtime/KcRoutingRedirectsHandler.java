@@ -56,7 +56,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
       * @param map the map to test for Null or Empty
       * @return true if map is null or empty
      */
-    public static boolean isNullOrEmptyMap(final Map<?, ?> map) {
+    private static boolean isNullOrEmptyMap(final Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
 
@@ -202,16 +202,18 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      */
     private static boolean PathAllowsHandler(final RoutingContext rc) {
       // There is an allow list to cross reference
-      String hostAddress = rc.request().localAddress().hostAddress();
-      String[] allowedCIDRs = pathAllowsMap.get(rc.normalizedPath()).split(",");
-      List<String> allowedCIDRsList = new ArrayList<String>();
-      allowedCIDRsList = Arrays.asList(allowedCIDRs);
-      LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
-      for (String i : allowedCIDRsList) {
-        if (matches(hostAddress, i)) {
-            LOGGER.debugf("Allow Match Found %s: Allowing Routing %s to next hop", i, rc.normalizedPath());
-            rc.next();
-            return true;
+      if( !isNullOrEmptyMap(pathAllowsMap) && rc.request().localAddress().hostAddress() !=null) {
+        String hostAddress = rc.request().localAddress().hostAddress();
+        String[] allowedCIDRs = pathAllowsMap.get(rc.normalizedPath()).split(",");
+        List<String> allowedCIDRsList = new ArrayList<String>();
+        allowedCIDRsList = Arrays.asList(allowedCIDRs);
+        LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
+        for (String i : allowedCIDRsList) {
+          if (matches(hostAddress, i)) {
+              LOGGER.debugf("Allow Match Found %s: Allowing Routing %s to next hop", i, rc.normalizedPath());
+              rc.next();
+              return true;
+          }
         }
       }
       return false;
