@@ -1,4 +1,4 @@
-package dod.p1.kc.routing.redirects.deployment.pathfilters;
+package dod.p1.kc.routing.deployment.pathfilters;
 
 import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
@@ -28,9 +28,9 @@ public class SimplePathFilterThroughTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing-redirects.path-filters./first=/testwebserver1\n" +
-                  "quarkus.kc-routing-redirects.path-filters./first/second=/testwebserver1\n" +
-                  "quarkus.kc-routing-redirects.path-filters./first/subpath1=/testwebserver1/subpath1/subpath2\n"),
+                  "quarkus.kc-routing.path-filters./first=/testwebserver1\n" +
+                  "quarkus.kc-routing.path-filters./first/second=/testwebserver1\n" +
+                  "quarkus.kc-routing.path-filters./first/subpath1=/testwebserver1/subpath1/subpath2\n"),
                   "application.properties"));
 
   @Route(path = "/testwebserver1")

@@ -1,4 +1,4 @@
-package dod.p1.kc.routing.redirects.deployment.config;
+package dod.p1.kc.routing.deployment.config;
 
 import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
@@ -22,11 +22,11 @@ public class ConfigPropertyMapInjectionTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing-redirects.path-redirects./MapKey1=/MapValue1\n" +
-                  "quarkus.kc-routing-redirects.path-redirects./MapKey2=/MapValue2\n"),
+                  "quarkus.kc-routing.path-redirects./MapKey1=/MapValue1\n" +
+                  "quarkus.kc-routing.path-redirects./MapKey2=/MapValue2\n"),
                   "application.properties"));
 
-  @ConfigProperty(name = "quarkus.kc-routing-redirects.path-redirects")
+  @ConfigProperty(name = "quarkus.kc-routing.path-redirects")
   Map<String, String> pathRedirects;
 
   @Test

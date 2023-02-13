@@ -1,5 +1,5 @@
-package dod.p1.kc.routing.redirects.deployment;
-import dod.p1.kc.routing.redirects.runtime.KcRoutingRedirectsRecorder;
+package dod.p1.kc.routing.deployment;
+import dod.p1.kc.routing.runtime.KcRoutingRecorder;
 
 import java.util.HashMap;
 
@@ -13,17 +13,17 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 
-public class KcRoutingRedirectsProcessor {
+public class KcRoutingProcessor {
 
     /**
      * Define logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsProcessor.class);
+    private static final Logger LOGGER = Logger.getLogger(KcRoutingProcessor.class);
 
     /**
      * Name of feature required for quarkus build augmentation phase.
      */
-    private static final String FEATURE = "kc-routing-redirects";
+    private static final String FEATURE = "kc-routing";
 
 
     /**
@@ -40,20 +40,20 @@ public class KcRoutingRedirectsProcessor {
      * @param recorder
      * @param routes
      * @param nonApplicationRootPathBuildItem
-     * @param kcRoutingRedirectsConfig
+     * @param kcRoutingConfig
      */
     @BuildStep
     @Record(ExecutionTime.STATIC_INIT)
-    public void registerKcRoutingRedirectsHandler(final KcRoutingRedirectsRecorder recorder,
+    public void registerKcRoutingHandler(final KcRoutingRecorder recorder,
             final BuildProducer<RouteBuildItem> routes,
             final NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
-            final KcRoutingRedirectsConfig kcRoutingRedirectsConfig) {
+            final KcRoutingConfig kcRoutingConfig) {
 
-        HashMap<String, String> pathRedirectsMap = new HashMap<>(kcRoutingRedirectsConfig.pathRedirects);
-        HashMap<String, String> pathPrefixesMap = new HashMap<>(kcRoutingRedirectsConfig.pathPrefixes);
-        HashMap<String, String> pathFiltersMap = new HashMap<>(kcRoutingRedirectsConfig.pathFilters);
-        HashMap<String, String> pathBlocksMap = new HashMap<>(kcRoutingRedirectsConfig.pathBlocks);
-        HashMap<String, String> pathAllowsMap = new HashMap<>(kcRoutingRedirectsConfig.pathAllows);
+        HashMap<String, String> pathRedirectsMap = new HashMap<>(kcRoutingConfig.pathRedirects);
+        HashMap<String, String> pathPrefixesMap = new HashMap<>(kcRoutingConfig.pathPrefixes);
+        HashMap<String, String> pathFiltersMap = new HashMap<>(kcRoutingConfig.pathFilters);
+        HashMap<String, String> pathBlocksMap = new HashMap<>(kcRoutingConfig.pathBlocks);
+        HashMap<String, String> pathAllowsMap = new HashMap<>(kcRoutingConfig.pathAllows);
 
         pathRedirectsMap.forEach((k, v) -> {
           LOGGER.infof("Creating Redirect Routes: %s %s", k, v);

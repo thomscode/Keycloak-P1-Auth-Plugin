@@ -1,4 +1,4 @@
-package dod.p1.kc.routing.redirects.deployment;
+package dod.p1.kc.routing.deployment;
 
 import java.util.Map;
 
@@ -7,7 +7,7 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 
 //https://quarkus.io/guides/config-mappings
 @ConfigRoot
-public class KcRoutingRedirectsConfig {
+public class KcRoutingConfig {
     /**
      * The path where KC Redirects is available.
      * <p>
@@ -44,7 +44,7 @@ public class KcRoutingRedirectsConfig {
     /**
      * Map of dest ports to uri paths to block.
      * <p>
-     * Example: Block /metrics on port 8443 - quarkus.kc-routing-redirects.path-block.8443=/metrics
+     * Example: Block /metrics on port 8443 - quarkus.kc-routing.path-block.8443=/metrics
      * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
      */
     @ConfigItem()
@@ -55,7 +55,7 @@ public class KcRoutingRedirectsConfig {
     /**
      * Map of source IPs to uri paths to allow superseding blocks.
      * <p>
-     * Example: Allow /metrics on for source CIDR 10.42.0.0 - quarkus.kc-routing-redirects.path-block.8443=/metrics
+     * Example: Allow /metrics on for source CIDR 10.42.0.0 - quarkus.kc-routing.path-block.8443=/metrics
      * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
      */
     @ConfigItem()

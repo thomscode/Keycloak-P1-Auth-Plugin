@@ -1,4 +1,4 @@
-package dod.p1.kc.routing.redirects.deployment.pathprefixes;
+package dod.p1.kc.routing.deployment.pathprefixes;
 
 import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
@@ -21,8 +21,8 @@ public class SimplePathPrefixThroughTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing-redirects.path-prefixes./first/second=/newfirst/newsecond\n" +
-                  "quarkus.kc-routing-redirects.path-prefixes./path1/path2=/replacement\n"),
+                  "quarkus.kc-routing.path-prefixes./first/second=/newfirst/newsecond\n" +
+                  "quarkus.kc-routing.path-prefixes./path1/path2=/replacement\n"),
                   "application.properties"));
 
   @Test

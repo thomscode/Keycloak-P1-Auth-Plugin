@@ -1,4 +1,4 @@
-package dod.p1.kc.routing.redirects.runtime;
+package dod.p1.kc.routing.runtime;
 
 import org.jboss.logging.Logger;
 import java.util.HashMap;
@@ -16,12 +16,12 @@ import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 
 @ApplicationScoped
-public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
+public class KcRoutingHandler implements Handler<RoutingContext> {
 
     /**
      * declare logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(KcRoutingRedirectsHandler.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(KcRoutingHandler.class.getName());
 
     /**
      * the pathRedirectsMap.
@@ -68,11 +68,13 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
     public void handle(final RoutingContext rc) {
 
       //Enable when adding new code for more debug output
-      if (LOGGER.isDebugEnabled()) DebugHTTPHeaders(rc);
-      PathRedirectsHandler(rc);
-      PathPrefixesHandler(rc);
-      PathFiltersHandler(rc);
-      PathBlocksHandler(rc);
+      if (LOGGER.isDebugEnabled()) {
+        debugHTTPHeaders(rc);
+      }
+      pathRedirectsHandler(rc);
+      pathPrefixesHandler(rc);
+      pathFiltersHandler(rc);
+      pathBlocksHandler(rc);
 
     }
     /**
@@ -89,10 +91,10 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
         return ipAddressMatcher.matches(ip);
     }
     /**
-     * Debug output used for troubleshooting HTTP Headers
+     * Debug output used for troubleshooting HTTP Headers.
      * @param rc
      */
-    private static void DebugHTTPHeaders(final RoutingContext rc) {
+    private static void debugHTTPHeaders(final RoutingContext rc) {
       // Host = https for https and either http or none for http traffic
       //https://vertx.io/docs/apidocs/io/vertx/core/http/HttpServerRequest.html
       LOGGER.debugf("Uri %s", rc.request().uri());
@@ -110,8 +112,8 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * Handler for Redirects processing.
      * @param rc
      */
-    private static void PathRedirectsHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: PathRedirectsHandler(%s)");
+    private static void pathRedirectsHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingHandler: PathRedirectsHandler(%s)");
       if (!isNullOrEmptyMap(pathRedirectsMap) && pathRedirectsMap.containsKey(rc.normalizedPath())) {
         LOGGER.debugf("Redirect Match: %s to %s", rc.normalizedPath(), pathRedirectsMap.get(rc.normalizedPath()));
         rc.redirect(pathRedirectsMap.get(rc.normalizedPath()));
@@ -121,8 +123,8 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * Handler for Prefixes processing.
      * @param rc
      */
-    private static void PathPrefixesHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: PathPrefixesHandler(%s)");
+    private static void pathPrefixesHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingHandler: PathPrefixesHandler(%s)");
       if (!isNullOrEmptyMap(pathPrefixesMap)) {
         pathPrefixesMap.forEach((k, v) -> {
           if (rc.normalizedPath().startsWith(k)) {
@@ -138,8 +140,8 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * Handler for Fiilters processing.
      * @param rc
      */
-    private static void PathFiltersHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: PathFiltersHandler(%s)");
+    private static void pathFiltersHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingHandler: PathFiltersHandler(%s)");
       if (!isNullOrEmptyMap(pathFiltersMap) && pathFiltersMap.containsKey(rc.normalizedPath())) {
         LOGGER.debugf("Filter Match: %s to %s", rc.normalizedPath(), pathFiltersMap.get(rc.normalizedPath()));
         LOGGER.debugf("uri before: %s", rc.request().uri());
@@ -157,8 +159,8 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * Handler for Blocks processing.
      * @param rc
      */
-    private static void PathBlocksHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: PathBlocksHandler(%s)");
+    private static void pathBlocksHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingHandler: PathBlocksHandler(%s)");
       if (!isNullOrEmptyMap(pathBlocksMap) && pathBlocksMap.containsKey(rc.normalizedPath())) {
 
         LOGGER.debugf("Blocks Match on Key/Path %s testing Value/Port for match to %s",
@@ -169,7 +171,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
           rc.normalizedPath(), pathAllowsMap.get(rc.normalizedPath()));
         }
 
-        if (!PathAllowsHandler(rc)) {
+        if (!pathAllowsHandler(rc)) {
           // There is not an allow list to cross reference
           // Below keeps ports as strings
           String localPort = String.valueOf(rc.request().localAddress().port());
@@ -199,10 +201,11 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
     /**
      * Handler for Allows processing.
      * @param rc
+     * @return true if allow match false if no match
      */
-    private static boolean PathAllowsHandler(final RoutingContext rc) {
+    private static boolean pathAllowsHandler(final RoutingContext rc) {
       // There is an allow list to cross reference
-      if( !isNullOrEmptyMap(pathAllowsMap) && rc.request().localAddress().hostAddress() !=null) {
+      if (!isNullOrEmptyMap(pathAllowsMap) && rc.request().localAddress().hostAddress() != null) {
         String hostAddress = rc.request().localAddress().hostAddress();
         String[] allowedCIDRs = pathAllowsMap.get(rc.normalizedPath()).split(",");
         List<String> allowedCIDRsList = new ArrayList<String>();
@@ -223,7 +226,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * @param argpathRedirectsMap
      */
     public static void setPathRedirects(final Map<String, String> argpathRedirectsMap) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: setPathRedirects(%s) ", argpathRedirectsMap);
+      LOGGER.debugf("KcRoutingHandler: setPathRedirects(%s) ", argpathRedirectsMap);
       pathRedirectsMap = (HashMap<String, String>) argpathRedirectsMap;
     }
 
@@ -232,7 +235,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * @param argpathPrefixesMap
      */
     public static void setPathPrefixes(final Map<String, String> argpathPrefixesMap) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: setPathPrefixes(%s) ", argpathPrefixesMap);
+      LOGGER.debugf("KcRoutingHandler: setPathPrefixes(%s) ", argpathPrefixesMap);
       pathPrefixesMap = (HashMap<String, String>) argpathPrefixesMap;
     }
     /**
@@ -240,7 +243,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * @param argpathFiltersMap
      */
     public static void setPathFilters(final Map<String, String> argpathFiltersMap) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: setPathFilters(%s) ", argpathFiltersMap);
+      LOGGER.debugf("KcRoutingHandler: setPathFilters(%s) ", argpathFiltersMap);
       pathFiltersMap = (HashMap<String, String>) argpathFiltersMap;
     }
     /**
@@ -248,7 +251,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * @param argPathBlocksMap
      */
     public static void setPathBlocks(final Map<String, String> argPathBlocksMap) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: setPathBlocks(%s) ", argPathBlocksMap);
+      LOGGER.debugf("KcRoutingHandler: setPathBlocks(%s) ", argPathBlocksMap);
       pathBlocksMap = (HashMap<String, String>) argPathBlocksMap;
     }
     /**
@@ -256,7 +259,7 @@ public class KcRoutingRedirectsHandler implements Handler<RoutingContext> {
      * @param argPathAllowsMap
      */
     public static void setPathAllows(final Map<String, String> argPathAllowsMap) {
-      LOGGER.debugf("KcRoutingRedirectsHandler: setPathAllows(%s) ", argPathAllowsMap);
+      LOGGER.debugf("KcRoutingHandler: setPathAllows(%s) ", argPathAllowsMap);
       pathAllowsMap = (HashMap<String, String>) argPathAllowsMap;
     }
 }
