@@ -29,35 +29,43 @@ public class SimpleBlockTest {
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
                   "quarkus.kc-routing.path-block./block1=9006\n" +
-                  "quarkus.kc-routing.path-block./block2=9006\n" +
+                  "quarkus.kc-routing.path-block./block2/=9006\n" +
                   "quarkus.kc-routing.path-block./block3/subpath=9006\n"),
                   "application.properties"));
   @Test
-  public void testOne() {
+  public void testStraight() {
     given()
       .when()
       .get("http://localhost:9006/block1")
       .then().statusCode(HTTP_BAD_REQUEST)
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
-
+  // Don't append slash in application-properties as it hangs system if browser does not append
   @Test
-  public void testTwo() {
+  public void testWithSlash() {
     given()
       .when()
-      .get("http://localhost:9006/block2")
+      .get("http://localhost:9006/block2/")
       .then().statusCode(HTTP_BAD_REQUEST)
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
-
-  // @Test
-  // public void testMultiLevel() {
-  //   given()
-  //     .when()
-  //     .get("http://localhost:9006/block1/subpath")
-  //     .then().statusCode(400);
-  // }
-
+  @Test
+  public void testWithSubpath() {
+    given()
+      .when()
+      .get("http://localhost:9006/block3/subpath")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  // Below tests should all pass through without being blocked
+  @Test
+  public void testNonSubPath() {
+    given()
+      .when()
+      .get("http://localhost:9006/block1/shouldNotBlock")
+      .then().statusCode(HTTP_NOT_FOUND)
+      .body(is("<html><body><h1>Resource not found</h1></body></html>"));
+  }
   @Test
   public void testWrongCase() {
     given()
@@ -67,14 +75,12 @@ public class SimpleBlockTest {
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
   }
 
-
   @Test
   public void testNonRoute() {
     given()
       .when()
-      .get("http://localhost:9006/dontBlock1")
+      .get("http://localhost:9006/shouldNotBlock")
       .then().statusCode(HTTP_NOT_FOUND)
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
   }
-
 }

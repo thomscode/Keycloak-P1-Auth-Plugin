@@ -80,6 +80,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       pathFiltersHandler(rc);
       pathBlocksHandler(rc);
       pathRecursiveBlocksHandler(rc);
+      LOGGER.debugf("handle: below all runs: %s", rc.normalizedPath());
 
     }
     /**
