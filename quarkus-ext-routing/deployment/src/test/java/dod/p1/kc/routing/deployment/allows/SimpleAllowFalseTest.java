@@ -19,8 +19,8 @@ public class SimpleAllowFalseTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing.path-redirects./DontFollow1=/ArbitraryValue\n" +
-                  "quarkus.kc-routing.path-redirects./DontFollow2=/ArbitraryValue\n"),
+                  "quarkus.kc-routing.path-redirect./DontFollow1=/ArbitraryValue\n" +
+                  "quarkus.kc-routing.path-redirect./DontFollow2=/ArbitraryValue\n"),
                   "application.properties"));
   @Test
   public void testOne() {

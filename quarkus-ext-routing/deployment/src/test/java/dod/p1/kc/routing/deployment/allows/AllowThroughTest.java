@@ -26,9 +26,9 @@ public class AllowThroughTest {
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
                   // We need a real path that root points to for follows to work
-                  "quarkus.kc-routing.path-redirects./Follow1=/TestWebServer\n" +
-                  "quarkus.kc-routing.path-redirects./Follow2/SubPath=/TestWebServer\n" +
-                  "quarkus.kc-routing.path-redirects./Follow3=/DoesNotExist\n"),
+                  "quarkus.kc-routing.path-redirect./Follow1=/TestWebServer\n" +
+                  "quarkus.kc-routing.path-redirect./Follow2/SubPath=/TestWebServer\n" +
+                  "quarkus.kc-routing.path-redirect./Follow3=/DoesNotExist\n"),
                   "application.properties"));
 
   @Route(path = "TestWebServer")

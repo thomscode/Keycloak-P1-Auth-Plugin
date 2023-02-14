@@ -40,6 +40,10 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
      */
     private static HashMap<String, String> pathBlocksMap = null;
     /**
+     * the pathRecursiveBlocksMap.
+     */
+    private static HashMap<String, String> pathRecursiveBlocksMap = null;
+    /**
      * the pathAllowsMap.
      */
     private static HashMap<String, String> pathAllowsMap = null;
@@ -75,6 +79,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       pathPrefixesHandler(rc);
       pathFiltersHandler(rc);
       pathBlocksHandler(rc);
+      pathRecursiveBlocksHandler(rc);
 
     }
     /**
@@ -163,12 +168,14 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       LOGGER.debugf("KcRoutingHandler: PathBlocksHandler(%s)");
       if (!isNullOrEmptyMap(pathBlocksMap) && pathBlocksMap.containsKey(rc.normalizedPath())) {
 
-        LOGGER.debugf("Blocks Match on Key/Path %s testing Value/Port for match to %s",
-          rc.normalizedPath(), pathBlocksMap.get(rc.normalizedPath()));
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debugf("Block Match on Path %s to Key %s checking if port matches.",
+            rc.normalizedPath(), pathBlocksMap.get(rc.normalizedPath()));
 
-        if (!isNullOrEmptyMap(pathAllowsMap) && pathAllowsMap.containsKey(rc.normalizedPath())) {
-          LOGGER.debugf("Allows Match on Key/Path %s testing Value/CIDR for match to %s",
-          rc.normalizedPath(), pathAllowsMap.get(rc.normalizedPath()));
+          if (!isNullOrEmptyMap(pathAllowsMap) && pathAllowsMap.containsKey(rc.normalizedPath())) {
+            LOGGER.debugf("Allow Match on Path %s checking Value/CIDR for match to %s",
+            rc.normalizedPath(), pathAllowsMap.get(rc.normalizedPath()));
+          }
         }
 
         if (!pathAllowsHandler(rc)) {
@@ -188,7 +195,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
           LOGGER.debugf("Blacklisted Ports: %s", portsList);
 
           if (portsList.contains(localPort)) {
-              LOGGER.debugf("Blocking Routing to %s", (pathBlocksMap.get(rc.normalizedPath())));
+              LOGGER.debugf("Port Match! Blocking Route on port %s", localPort);
               //rc.end();
               rc.fail(HTTP_BAD_REQUEST);
           } else {
@@ -199,13 +206,87 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       }
     }
     /**
+     * Handler for Blocks processing.
+     * @param rc
+     */
+    private static void pathRecursiveBlocksHandler(final RoutingContext rc) {
+      LOGGER.debugf("KcRoutingHandler: pathRecursiveBlocksHandler(%s)");
+
+      if (!isNullOrEmptyMap(pathRecursiveBlocksMap)) {
+        pathRecursiveBlocksMap.forEach((k, v) -> {
+          if (rc.normalizedPath().startsWith(k)) {
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debugf("Recursive Block Match on Path %s to Key %s checking if port matches.",
+              rc.normalizedPath(), k);
+              if (!isNullOrEmptyMap(pathAllowsMap)) {
+                pathAllowsMap.forEach((k2, v2) -> {
+                  if (rc.normalizedPath().startsWith(k2)) {
+                    LOGGER.debugf("Allow Match on Path %s to Key %s checking Value/CIDR for match to %s",
+                    rc.normalizedPath(), k2, v2);
+                  }
+                });
+              }
+            }
+            if (!pathAllowsHandlerForRecursiveBlock(rc)) {
+              String localPort = String.valueOf(rc.request().localAddress().port());
+              pathRecursiveBlocksMap.forEach((k2, v2) -> {
+                if (rc.normalizedPath().startsWith(k2)) {
+                  String[] portsStringArray = v2.split(",");
+                  List<String> portsList = new ArrayList<String>();
+                  portsList = Arrays.asList(portsStringArray);
+
+                  LOGGER.debugf("Blacklisted Ports: %s", portsList);
+
+                  if (portsList.contains(localPort)) {
+                      LOGGER.debugf("Port match, Blocking Route on Port %s", localPort);
+                      //rc.end();
+                      rc.fail(HTTP_BAD_REQUEST);
+                  } else {
+                      LOGGER.debugf("Allowing Route %s to next hop", rc.normalizedPath());
+                      rc.next();
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    }
+    /**
+     * Handler for Allows processing used with PathRecursiveBlocks.
+     * @param rc
+     * @return true if allow match false if no match
+     */
+    private static boolean pathAllowsHandlerForRecursiveBlock(final RoutingContext rc) {
+      // There is an allow list to cross reference
+      if (!isNullOrEmptyMap(pathAllowsMap) && rc.request().localAddress().hostAddress() != null) {
+        String hostAddress = rc.request().localAddress().hostAddress();
+        for (Map.Entry<String, String> entry : pathAllowsMap.entrySet()) {
+          if (rc.normalizedPath().startsWith(entry.getKey())) {
+            String[] allowedCIDRs = entry.getValue().split(",");
+            List<String> allowedCIDRsList = new ArrayList<String>();
+            allowedCIDRsList = Arrays.asList(allowedCIDRs);
+            LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
+            for (String i : allowedCIDRsList) {
+              if (matches(hostAddress, i)) {
+                  LOGGER.debugf("Allow Match Found %s Routing %s to next hop", i, rc.normalizedPath());
+                  rc.next();
+                  return true;
+              }
+            }
+          }
+        }
+      }
+      return false;
+    }
+    /**
      * Handler for Allows processing.
      * @param rc
      * @return true if allow match false if no match
      */
     private static boolean pathAllowsHandler(final RoutingContext rc) {
       // There is an allow list to cross reference
-      if (!isNullOrEmptyMap(pathAllowsMap) && rc.request().localAddress().hostAddress() != null) {
+      if (!isNullOrEmptyMap(pathAllowsMap) && pathAllowsMap.containsKey(rc.normalizedPath()) && rc.request().localAddress().hostAddress() != null) {
         String hostAddress = rc.request().localAddress().hostAddress();
         String[] allowedCIDRs = pathAllowsMap.get(rc.normalizedPath()).split(",");
         List<String> allowedCIDRsList = new ArrayList<String>();
@@ -213,7 +294,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
         LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
         for (String i : allowedCIDRsList) {
           if (matches(hostAddress, i)) {
-              LOGGER.debugf("Allow Match Found %s: Allowing Routing %s to next hop", i, rc.normalizedPath());
+              LOGGER.debugf("Allow Match Found %s Routing %s to next hop", i, rc.normalizedPath());
               rc.next();
               return true;
           }
@@ -253,6 +334,14 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
     public static void setPathBlocks(final Map<String, String> argPathBlocksMap) {
       LOGGER.debugf("KcRoutingHandler: setPathBlocks(%s) ", argPathBlocksMap);
       pathBlocksMap = (HashMap<String, String>) argPathBlocksMap;
+    }
+    /**
+     *
+     * @param argPathRecursiveBlocksMap
+     */
+    public static void setPathRecursiveBlocks(final Map<String, String> argPathRecursiveBlocksMap) {
+      LOGGER.debugf("KcRoutingHandler: setPathRecursiveBlocks(%s) ", argPathRecursiveBlocksMap);
+      pathRecursiveBlocksMap = (HashMap<String, String>) argPathRecursiveBlocksMap;
     }
     /**
      *

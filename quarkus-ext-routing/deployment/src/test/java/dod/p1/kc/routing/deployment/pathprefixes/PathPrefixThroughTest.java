@@ -21,8 +21,8 @@ public class PathPrefixThroughTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing.path-prefixes./first/second=/newfirst/newsecond\n" +
-                  "quarkus.kc-routing.path-prefixes./path1/path2=/replacement\n"),
+                  "quarkus.kc-routing.path-prefix./first/second=/newfirst/newsecond\n" +
+                  "quarkus.kc-routing.path-prefix./path1/path2=/replacement\n"),
                   "application.properties"));
 
   @Test

@@ -49,11 +49,12 @@ public class KcRoutingProcessor {
             final NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
             final KcRoutingConfig kcRoutingConfig) {
 
-        HashMap<String, String> pathRedirectsMap = new HashMap<>(kcRoutingConfig.pathRedirects);
-        HashMap<String, String> pathPrefixesMap = new HashMap<>(kcRoutingConfig.pathPrefixes);
-        HashMap<String, String> pathFiltersMap = new HashMap<>(kcRoutingConfig.pathFilters);
-        HashMap<String, String> pathBlocksMap = new HashMap<>(kcRoutingConfig.pathBlocks);
-        HashMap<String, String> pathAllowsMap = new HashMap<>(kcRoutingConfig.pathAllows);
+        HashMap<String, String> pathRedirectsMap = new HashMap<>(kcRoutingConfig.pathRedirect);
+        HashMap<String, String> pathPrefixesMap = new HashMap<>(kcRoutingConfig.pathPrefix);
+        HashMap<String, String> pathFiltersMap = new HashMap<>(kcRoutingConfig.pathFilter);
+        HashMap<String, String> pathBlocksMap = new HashMap<>(kcRoutingConfig.pathBlock);
+        HashMap<String, String> pathRecursiveBlocksMap = new HashMap<>(kcRoutingConfig.pathRecursiveBlock);
+        HashMap<String, String> pathAllowsMap = new HashMap<>(kcRoutingConfig.pathAllow);
 
         pathRedirectsMap.forEach((k, v) -> {
           LOGGER.infof("Creating Redirect Routes: %s %s", k, v);
@@ -85,11 +86,20 @@ public class KcRoutingProcessor {
         pathBlocksMap.forEach((k, v) -> {
           LOGGER.infof("Creating Block Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
-                  .route(k + "/*")
+                  .route(k)
                   .handler(recorder.getHandler())
                   .build());
         });
         recorder.setPathBlocks(pathBlocksMap);
+
+        pathRecursiveBlocksMap.forEach((k, v) -> {
+          LOGGER.infof("Creating Recursive Block Routes: %s %s", k, v);
+          routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
+                  .route(k + "/*")
+                  .handler(recorder.getHandler())
+                  .build());
+        });
+        recorder.setPathRecursiveBlocks(pathRecursiveBlocksMap);
 
         pathAllowsMap.forEach((k, v) -> {
           LOGGER.infof("Creating Allow Routes: %s %s", k, v);

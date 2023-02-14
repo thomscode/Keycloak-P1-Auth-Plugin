@@ -20,9 +20,9 @@ public class SimpleBlockTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing.path-blocks./block1=9006\n" +
-                  "quarkus.kc-routing.path-blocks./block2=9006\n" +
-                  "quarkus.kc-routing.path-blocks./block3/subpath=9006\n"),
+                  "quarkus.kc-routing.path-block./block1=9006\n" +
+                  "quarkus.kc-routing.path-block./block2=9006\n" +
+                  "quarkus.kc-routing.path-block./block3/subpath=9006\n"),
                   "application.properties"));
   @Test
   public void testOne() {

@@ -16,7 +16,7 @@ public class KcRoutingConfig {
      */
     @ConfigItem
     //CHECKSTYLE:OFF
-    Map<String, String> pathRedirects;
+    Map<String, String> pathRedirect;
     //CHECKSTYLE:ON
 
     /**
@@ -27,7 +27,7 @@ public class KcRoutingConfig {
      */
     @ConfigItem()
     //CHECKSTYLE:OFF
-    Map<String, String> pathPrefixes;
+    Map<String, String> pathPrefix;
     //CHECKSTYLE:ON
 
     /**
@@ -38,18 +38,29 @@ public class KcRoutingConfig {
      */
     @ConfigItem()
     //CHECKSTYLE:OFF
-    Map<String, String> pathFilters;
+    Map<String, String> pathFilter;
     //CHECKSTYLE:ON
 
     /**
-     * Map of dest ports to uri paths to block.
+     * Map of dest ports to uri paths to block, but absolute, not recursive.
      * <p>
      * Example: Block /metrics on port 8443 - quarkus.kc-routing.path-block.8443=/metrics
      * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
      */
     @ConfigItem()
     //CHECKSTYLE:OFF
-    Map<String, String> pathBlocks;
+    Map<String, String> pathBlock;
+    //CHECKSTYLE:ON
+
+    /**
+     * Map of dest ports to uri paths to block recursively
+     * <p>
+     * Example: Block /metrics on port 8443 - quarkus.kc-routing.path-recursive-block.8443=/metrics
+     * By default, this value will be resolved as a path relative to `${quarkus.http.non-application-root-path}`.
+     */
+    @ConfigItem()
+    //CHECKSTYLE:OFF
+    Map<String, String> pathRecursiveBlock;
     //CHECKSTYLE:ON
 
     /**
@@ -60,7 +71,7 @@ public class KcRoutingConfig {
      */
     @ConfigItem()
     //CHECKSTYLE:OFF
-    Map<String, String> pathAllows;
+    Map<String, String> pathAllow;
     //CHECKSTYLE:ON
 
     /**

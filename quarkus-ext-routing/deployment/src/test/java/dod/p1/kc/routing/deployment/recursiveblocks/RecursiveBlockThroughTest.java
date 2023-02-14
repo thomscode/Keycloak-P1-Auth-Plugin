@@ -17,7 +17,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 
-public class BlockThroughTest {
+public class RecursiveBlockThroughTest {
 
   // @RegisterExtension
   // static final QuarkusUnitTest config = new QuarkusUnitTest();

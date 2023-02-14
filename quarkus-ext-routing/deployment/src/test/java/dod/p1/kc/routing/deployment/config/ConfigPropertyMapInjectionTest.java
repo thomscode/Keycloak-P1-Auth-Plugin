@@ -22,11 +22,11 @@ public class ConfigPropertyMapInjectionTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing.path-redirects./MapKey1=/MapValue1\n" +
-                  "quarkus.kc-routing.path-redirects./MapKey2=/MapValue2\n"),
+                  "quarkus.kc-routing.path-redirect./MapKey1=/MapValue1\n" +
+                  "quarkus.kc-routing.path-redirect./MapKey2=/MapValue2\n"),
                   "application.properties"));
 
-  @ConfigProperty(name = "quarkus.kc-routing.path-redirects")
+  @ConfigProperty(name = "quarkus.kc-routing.path-redirect")
   Map<String, String> pathRedirects;
 
   @Test

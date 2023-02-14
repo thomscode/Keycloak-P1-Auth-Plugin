@@ -28,9 +28,9 @@ public class PathFilterThroughTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing.path-filters./first=/testwebserver1\n" +
-                  "quarkus.kc-routing.path-filters./first/second=/testwebserver1\n" +
-                  "quarkus.kc-routing.path-filters./first/subpath1=/testwebserver1/subpath1/subpath2\n"),
+                  "quarkus.kc-routing.path-filter./first=/testwebserver1\n" +
+                  "quarkus.kc-routing.path-filter./first/second=/testwebserver1\n" +
+                  "quarkus.kc-routing.path-filter./first/subpath1=/testwebserver1/subpath1/subpath2\n"),
                   "application.properties"));
 
   @Route(path = "/testwebserver1")
