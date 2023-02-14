@@ -14,9 +14,17 @@ import static org.hamcrest.CoreMatchers.is;
 
 public class SimpleBlockTest {
 
+  /**
+   * the HTTP_BAD_REQUEST.
+   */
+  public static final int HTTP_BAD_REQUEST = 400;
+  /**
+   * the HTTP_NOT_FOUND.
+   */
+  public static final int HTTP_NOT_FOUND = 404;
+
   // @RegisterExtension
   // static final QuarkusUnitTest config = new QuarkusUnitTest();
-
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
@@ -29,7 +37,8 @@ public class SimpleBlockTest {
     given()
       .when()
       .get("http://localhost:9006/block1")
-      .then().statusCode(400);
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
 
   @Test
@@ -37,7 +46,8 @@ public class SimpleBlockTest {
     given()
       .when()
       .get("http://localhost:9006/block2")
-      .then().statusCode(400);
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
 
   // @Test
@@ -53,7 +63,7 @@ public class SimpleBlockTest {
     given()
       .when()
       .get("http://localhost:9006/Block1")
-      .then().statusCode(404)
+      .then().statusCode(HTTP_NOT_FOUND)
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
   }
 
@@ -63,7 +73,7 @@ public class SimpleBlockTest {
     given()
       .when()
       .get("http://localhost:9006/dontBlock1")
-      .then().statusCode(404)
+      .then().statusCode(HTTP_NOT_FOUND)
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
   }
 

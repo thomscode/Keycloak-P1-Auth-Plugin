@@ -196,8 +196,8 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
 
           if (portsList.contains(localPort)) {
               LOGGER.debugf("Port Match! Blocking Route on port %s", localPort);
-              //rc.end();
-              rc.fail(HTTP_BAD_REQUEST);
+              //rc.fail(HTTP_BAD_REQUEST);
+              rc.response().setStatusCode(HTTP_BAD_REQUEST).end("<html><body><h1>Resource Blocked</h1></body></html>");
           } else {
               LOGGER.debugf("Allowing Routing %s to next hop", rc.normalizedPath());
               rc.next();
@@ -239,8 +239,9 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
 
                   if (portsList.contains(localPort)) {
                       LOGGER.debugf("Port match, Blocking Route on Port %s", localPort);
-                      //rc.end();
-                      rc.fail(HTTP_BAD_REQUEST);
+                      //rc.fail(HTTP_BAD_REQUEST);
+                      rc.response().setStatusCode(HTTP_BAD_REQUEST).end("<html><body><h1>Resource Blocked</h1></body></html>");
+
                   } else {
                       LOGGER.debugf("Allowing Route %s to next hop", rc.normalizedPath());
                       rc.next();
