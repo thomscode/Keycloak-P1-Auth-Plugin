@@ -18,9 +18,9 @@ import io.quarkus.vertx.web.RouteBase;
 import io.vertx.ext.web.RoutingContext;
 import org.jboss.logging.Logger;
 
-public class SimplePathFilterThroughTest {
+public class PathFilterThroughTest {
 
-  private static final Logger LOGGER = Logger.getLogger(SimplePathFilterThroughTest.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(PathFilterThroughTest.class.getName());
 
   // @RegisterExtension
   // static final QuarkusUnitTest config = new QuarkusUnitTest();

@@ -85,7 +85,7 @@ public class KcRoutingProcessor {
         pathBlocksMap.forEach((k, v) -> {
           LOGGER.infof("Creating Block Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
-                  .route(k)
+                  .route(k + "/*")
                   .handler(recorder.getHandler())
                   .build());
         });

@@ -1,4 +1,4 @@
-package dod.p1.kc.routing.deployment.redirects;
+package dod.p1.kc.routing.deployment.blocks;
 
 import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
@@ -17,7 +17,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 
-public class SimpleRedirectThroughTest {
+public class BlockThroughTest {
 
   // @RegisterExtension
   // static final QuarkusUnitTest config = new QuarkusUnitTest();
@@ -67,7 +67,7 @@ public class SimpleRedirectThroughTest {
 
   }
 
-  //Below test shows parameters are not passed with redirects
+  //Below test shows parameters are not passed with blocks
   @Test
   public void testWithParameters() {
     given()

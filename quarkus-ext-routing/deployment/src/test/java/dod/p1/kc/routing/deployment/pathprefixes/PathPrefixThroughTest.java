@@ -13,7 +13,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 
-public class SimplePathPrefixThroughTest {
+public class PathPrefixThroughTest {
 
   // @RegisterExtension
   // static final QuarkusUnitTest config = new QuarkusUnitTest();
@@ -37,7 +37,7 @@ public class SimplePathPrefixThroughTest {
       .header("Location", is("/newfirst/newsecond?testvar1=1&testvar2=2&testvarA=A&testvarB=B"));
 
   }
-  
+
   @Test
   public void testPrePathOnly() {
     given()
