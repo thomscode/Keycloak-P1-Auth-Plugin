@@ -12,7 +12,7 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
-public class SimpleRecursiveBlockTest {
+public class RecursiveBlockTest {
 
   /**
    * the HTTP_BAD_REQUEST.
@@ -28,16 +28,22 @@ public class SimpleRecursiveBlockTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  "quarkus.kc-routing.path-recursive-block./block1=9006\n" +
+                  "quarkus.kc-routing.path-recursive-block./block0=9006\n" +
                   "quarkus.kc-routing.path-recursive-block./block2/=9006\n" +
-                  "quarkus.kc-routing.path-recursive-block./block3/subpath=9006\n"),
+                  "quarkus.kc-routing.path-recursive-block./block3/subpath=9006\n" +
+                  "quarkus.kc-routing.path-recursive-block./block4=9005,9006\n" +
+                  "quarkus.kc-routing.path-recursive-block./block5=9006,9005\n" +
+                  "quarkus.kc-routing.path-recursive-block./block6/=9005,9006\n" +
+                  "quarkus.kc-routing.path-recursive-block./block7/subpath=9006,9005\n" +
+                  "quarkus.kc-routing.path-recursive-block./block8=9004,9005\n" +
+                  "quarkus.kc-routing.path-recursive-block./block9/subpath=9004,9005\n" +
+                  "quarkus.kc-routing.path-recursive-block./block10=9005\n"),
                   "application.properties"));
-  // Below tests should all be blocked
   @Test
   public void testStraight() {
     given()
       .when()
-      .get("http://localhost:9006/block1")
+      .get("http://localhost:9006/block0")
       .then().statusCode(HTTP_BAD_REQUEST)
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
@@ -59,22 +65,46 @@ public class SimpleRecursiveBlockTest {
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
   @Test
-  public void testNonSubPath() {
+  public void testWithMultiPorts() {
     given()
       .when()
-      .get("http://localhost:9006/block1/shouldBlock")
+      .get("http://localhost:9006/block4")
       .then().statusCode(HTTP_BAD_REQUEST)
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
+  @Test
+  public void testWithMultiPortsSwapped() {
+    given()
+      .when()
+      .get("http://localhost:9006/block5")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  @Test
+  public void testWithMultiPortsAndSlash() {
+    given()
+      .when()
+      .get("http://localhost:9006/block6/")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  @Test
+  public void testWithMultiPortsAndSubpath() {
+    given()
+      .when()
+      .get("http://localhost:9006/block7/subpath")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  // // Below tests should all pass through without being blocked
   // @Test
-  // public void testSlashWithNonSubPath() {
+  // public void testNonSubPath() {
   //   given()
   //     .when()
-  //     .get("http://localhost:9006/block2/should/block")
+  //     .get("http://localhost:9006/block1/shouldBlock")
   //     .then().statusCode(HTTP_BAD_REQUEST)
   //     .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   // }
-  // Below tests should all pass through without being blocked
   @Test
   public void testWrongCase() {
     given()
@@ -92,4 +122,28 @@ public class SimpleRecursiveBlockTest {
       .then().statusCode(HTTP_NOT_FOUND)
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
   }
+  @Test
+  public void testWithMultiPortsNonPortMatch() {
+    given()
+      .when()
+      .get("http://localhost:9006/block8")
+      .then().statusCode(HTTP_NOT_FOUND)
+      .body(is("<html><body><h1>Resource not found</h1></body></html>"));
+  }
+  @Test
+  public void testSubpathMultiPortsNonPortMatch() {
+    given()
+      .when()
+      .get("http://localhost:9006/block9/subpath")
+      .then().statusCode(HTTP_NOT_FOUND)
+      .body(is("<html><body><h1>Resource not found</h1></body></html>"));
+  }
+  // @Test
+  // public void testNonPortMatch() {
+  //   given()
+  //     .when()
+  //     .get("http://localhost:9006/block11")
+  //     .then().statusCode(HTTP_BAD_REQUEST)
+  //     .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  // }
 }

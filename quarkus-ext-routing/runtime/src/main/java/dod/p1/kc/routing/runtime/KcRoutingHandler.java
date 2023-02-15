@@ -63,7 +63,17 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
     private static boolean isNullOrEmptyMap(final Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
-
+    /**
+      * @param argPath
+      * @return Path without slash
+     */
+    private static String addTrailingSlash(final String argPath) {
+      if (argPath.endsWith("/")) {
+        return argPath;
+      }else{
+        return argPath + '/';
+      }
+    }
     /**
      *
      * @param rc the event to handle
@@ -213,17 +223,19 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
     private static void pathRecursiveBlocksHandler(final RoutingContext rc) {
       LOGGER.debugf("KcRoutingHandler: pathRecursiveBlocksHandler(%s)");
 
+      String path = addTrailingSlash(rc.normalizedPath());
+
       if (!isNullOrEmptyMap(pathRecursiveBlocksMap)) {
         pathRecursiveBlocksMap.forEach((k, v) -> {
-          if (rc.normalizedPath().startsWith(k)) {
+          if ( path.equals(k) || path.startsWith(k+'/')) {
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debugf("Recursive Block Match on Path %s to Key %s checking if port matches.",
-              rc.normalizedPath(), k);
+              path, k);
               if (!isNullOrEmptyMap(pathAllowsMap)) {
                 pathAllowsMap.forEach((k2, v2) -> {
-                  if (rc.normalizedPath().startsWith(k2)) {
+                  if (path.startsWith(k2)) {
                     LOGGER.debugf("Allow Match on Path %s to Key %s checking Value/CIDR for match to %s",
-                    rc.normalizedPath(), k2, v2);
+                    path, k2, v2);
                   }
                 });
               }
@@ -231,7 +243,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
             if (!pathAllowsHandlerForRecursiveBlock(rc)) {
               String localPort = String.valueOf(rc.request().localAddress().port());
               pathRecursiveBlocksMap.forEach((k2, v2) -> {
-                if (rc.normalizedPath().startsWith(k2)) {
+                if (path.startsWith(k2)) {
                   String[] portsStringArray = v2.split(",");
                   List<String> portsList = new ArrayList<String>();
                   portsList = Arrays.asList(portsStringArray);
@@ -244,7 +256,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
                       rc.response().setStatusCode(HTTP_BAD_REQUEST).end("<html><body><h1>Resource Blocked</h1></body></html>");
 
                   } else {
-                      LOGGER.debugf("Allowing Route %s to next hop", rc.normalizedPath());
+                      LOGGER.debugf("Allowing Route %s to next hop", path);
                       rc.next();
                   }
                 }

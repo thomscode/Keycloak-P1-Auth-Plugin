@@ -2,7 +2,7 @@ package dod.p1.kc.routing.deployment;
 import dod.p1.kc.routing.runtime.KcRoutingRecorder;
 
 import java.util.HashMap;
-
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -94,8 +94,9 @@ public class KcRoutingProcessor {
 
         pathRecursiveBlocksMap.forEach((k, v) -> {
           LOGGER.infof("Creating Recursive Block Routes: %s %s", k, v);
+          String path = StringUtils.stripEnd(k, "/");
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
-                  .route(k + "/*")
+                  .route(path + "/*")
                   .handler(recorder.getHandler())
                   .build());
         });
