@@ -1,5 +1,5 @@
 # How to update the Keycloak Plugin
-The Keycloak plugin is packaged in a plugin image. This repo is mirrored to Party Pus IL2 where a mission dev ops (MDO) piline is run with security scans. The MDO pipeline creates a jar artifact that is hosted in [Iron Bank](https://ironbank.dso.mil/repomap/details;registry1Path=big-bang%252Fp1-keycloak-plugin). The plugin image can be pulled at `registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:X.X.X`
+The Keycloak plugin is packaged in a plugin image. This repo is mirrored to Party Pus IL2 where a mission dev ops (MDO) pipeline is run with security scans. The MDO pipeline creates a jar artifact that is hosted in [Iron Bank](https://ironbank.dso.mil/repomap/details;registry1Path=big-bang%252Fp1-keycloak-plugin). The plugin image can be pulled at `registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:X.X.X`
 1. Be aware that there are two distributions of Keycloak. One is the legacy version that uses Wildfly for the application server. The other version is the new one using Quarkus. This plugin supports the new Keycloak Quarkus. The new Keycloak images in Iron Bank have tag names without `legacy`.
 1. Create a development branch and merge request. Can do this in the Gitlab UI from an issue.
 1. Recommended to use the free community version of Intellij IDEA instead of Visual Studio Code. Intellij IDEA has much better support for Java development. You can run unit tests with coverage and build from the IDE.
@@ -15,8 +15,18 @@ The Keycloak plugin is packaged in a plugin image. This repo is mirrored to Part
 # Testing new Keycloak version
 The plugin can be tested locally and in a k8s environment
 
-## Local development environment
-Follow instructions in the P1 Keycloak package repo for how to develop with a [local docker-compse](https://repo1.dso.mil/big-bang/apps/security-tools/keycloak/-/blob/main/development/README.md) environment.
+## Local plugin development environment
+Follow instructions in the P1 Keycloak package repo for how to do plugin development with a local [docker compse](https://repo1.dso.mil/big-bang/product/packages/keycloak/-/tree/main/development) environment.
+
+## Local Quarkus Extension development environment
+There is a custom Quarkus extension for routing and redirects packaged inside this repo. Maven commands can be used to launch a local development environment. Then you can test in your browser at `http://localhost:9005`.
+    ```
+    mvn clean install -f quarkus-ext-routing/runtime && mvn clean compile -f quarkus-ext-routing/deployment quarkus:dev -Dquarkus.enforceBuildGoal=false -Dquarkus.profile=quarkusdev
+    ```
+If you get "Non-resolvable parent POM" errors when running mvn commands your local cache needs to be cleared by running
+    ```
+    mvn clean install -N
+    ```
 
 ## Development Testing with Kubernetes
-Follow instructions in the [P1 Keycloak package repo](https://repo1.dso.mil/big-bang/apps/security-tools/keycloak/-/blob/main/docs/DEVELOPMENT_MAINTENANCE.md) to delpoy Keycloak with plugin with Big Bang in Kubernetes.
+Follow instructions in the [P1 Keycloak package repo](https://repo1.dso.mil/big-bang/product/packages/keycloak/-/blob/main/docs/DEVELOPMENT_MAINTENANCE.md) to deploy Keycloak with plugin with Big Bang in Kubernetes.
