@@ -6,6 +6,7 @@
     <groupId>dod.p1</groupId>
     <artifactId>kc-routing-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <relativePath>..</relativePath>        
   </parent>
   <artifactId>kc-routing-deployment</artifactId>
   <name>Kc Routing - Deployment</name>
