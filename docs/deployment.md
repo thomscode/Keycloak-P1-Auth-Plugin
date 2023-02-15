@@ -1,6 +1,6 @@
 # Deployment Overview
 Jar files are deployed with Keycloak by placing them in `/opt/keycloak/providers/` directory. In a containerized k8s environment this happens by putting the jar in an plugin image and deploying the image as an additional init-container when Keycloak deploys. Keycloak k8s upstream is changing from Wildfly application server to  [Quarkus](https://www.keycloak.org/migration/migrating-to-quarkus). This plugin supports the new Keycloak Quarkus.
-This repo includes a custom Quarkus extension for routing and redirects. It is configurable with quarkus.properties. See the [development properties file](quarkus-ext-routing/deployment/src/main/resources/application-quarkusdev.properties) for examples of how to configure. Also see [example k8s operational values](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/assets/configs/example/keycloak-prod-values.yaml).
+This repo includes a custom Quarkus extension for routing and redirects. It is configurable with quarkus.properties. See the [development properties file](/quarkus-ext-routing/deployment/src/main/resources/application-quarkusdev.properties) for examples of how to configure. Also see [example k8s operational values](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/assets/configs/example/keycloak-prod-values.yaml).
 
 ## Deployment Details
 This documentation is intended to outline the manual steps so that it can be automated with configuration as code(CaC).
