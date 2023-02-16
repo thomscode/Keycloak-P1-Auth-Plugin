@@ -122,14 +122,14 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       LOGGER.debugf("Method: %s", rc.request().method());
       LOGGER.debugf("Host:  %s", rc.request().host());
       LOGGER.debugf("isSSL: %s", rc.request().isSSL());
-      LOGGER.debugf("Headers: \n%s", rc.request().headers());
+      //LOGGER.debugf("Headers: \n%s", rc.request().headers());
     }
     /**
      * Handler for Redirects processing.
      * @param rc
      */
     private static void pathRedirectsHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingHandler: PathRedirectsHandler(%s)");
+      LOGGER.debugf("KcRoutingHandler: PathRedirectsHandler(%s)", rc.normalizedPath());
       if (!isNullOrEmptyMap(pathRedirectsMap) && pathRedirectsMap.containsKey(rc.normalizedPath())) {
         LOGGER.debugf("Redirect Match: %s to %s", rc.normalizedPath(), pathRedirectsMap.get(rc.normalizedPath()));
         rc.redirect(pathRedirectsMap.get(rc.normalizedPath()));
@@ -140,7 +140,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
      * @param rc
      */
     private static void pathPrefixesHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingHandler: PathPrefixesHandler(%s)");
+      LOGGER.debugf("KcRoutingHandler: PathPrefixesHandler(%s)", rc.normalizedPath());
       if (!isNullOrEmptyMap(pathPrefixesMap)) {
         pathPrefixesMap.forEach((k, v) -> {
           if (rc.normalizedPath().startsWith(k)) {
@@ -157,7 +157,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
      * @param rc
      */
     private static void pathFiltersHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingHandler: PathFiltersHandler(%s)");
+      LOGGER.debugf("KcRoutingHandler: PathFiltersHandler(%s)", rc.normalizedPath());
       if (!isNullOrEmptyMap(pathFiltersMap) && pathFiltersMap.containsKey(rc.normalizedPath())) {
         LOGGER.debugf("Filter Match: %s to %s", rc.normalizedPath(), pathFiltersMap.get(rc.normalizedPath()));
         LOGGER.debugf("uri before: %s", rc.request().uri());
@@ -176,7 +176,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
      * @param rc
      */
     private static void pathBlocksHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingHandler: PathBlocksHandler(%s)");
+      LOGGER.debugf("KcRoutingHandler: PathBlocksHandler(%s)", rc.normalizedPath());
       if (!isNullOrEmptyMap(pathBlocksMap) && pathBlocksMap.containsKey(rc.normalizedPath())) {
 
         if (LOGGER.isDebugEnabled()) {
@@ -221,9 +221,10 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
      * @param rc
      */
     private static void pathRecursiveBlocksHandler(final RoutingContext rc) {
-      LOGGER.debugf("KcRoutingHandler: pathRecursiveBlocksHandler(%s)");
+      LOGGER.debugf("KcRoutingHandler: pathRecursiveBlocksHandler(%s)", rc.normalizedPath());
 
       String path = addTrailingSlash(rc.normalizedPath());
+      LOGGER.debugf("KcRoutingHandler: pathRecursiveBlocksHandler(%s)", path);
 
       if (!isNullOrEmptyMap(pathRecursiveBlocksMap)) {
         pathRecursiveBlocksMap.forEach((k, v) -> {
@@ -233,7 +234,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
               path, k);
               if (!isNullOrEmptyMap(pathAllowsMap)) {
                 pathAllowsMap.forEach((k2, v2) -> {
-                  if (path.startsWith(k2)) {
+                  if (path.equals(k2) || path.startsWith(k2 + '/')) {
                     LOGGER.debugf("Allow Match on Path %s to Key %s checking Value/CIDR for match to %s",
                     path, k2, v2);
                   }
@@ -243,7 +244,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
             if (!pathAllowsHandlerForRecursiveBlock(rc)) {
               String localPort = String.valueOf(rc.request().localAddress().port());
               pathRecursiveBlocksMap.forEach((k2, v2) -> {
-                if (path.startsWith(k2)) {
+                if (path.equals(k2) || path.startsWith(k2+'/')) {
                   String[] portsStringArray = v2.split(",");
                   List<String> portsList = new ArrayList<String>();
                   portsList = Arrays.asList(portsStringArray);
@@ -272,11 +273,14 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
      * @return true if allow match false if no match
      */
     private static boolean pathAllowsHandlerForRecursiveBlock(final RoutingContext rc) {
+      String path = addTrailingSlash(rc.normalizedPath());
+      LOGGER.debugf("KcRoutingHandler: pathAllowsHandlerForRecursiveBlock(%s)", path);
       // There is an allow list to cross reference
       if (!isNullOrEmptyMap(pathAllowsMap) && rc.request().localAddress().hostAddress() != null) {
         String hostAddress = rc.request().localAddress().hostAddress();
         for (Map.Entry<String, String> entry : pathAllowsMap.entrySet()) {
-          if (rc.normalizedPath().startsWith(entry.getKey())) {
+          LOGGER.debugf("KcRoutingHandler: entry.getKey(%s)", entry.getKey());          
+          if (path.equals(entry.getKey()) || path.startsWith(entry.getKey() + '/')) {
             String[] allowedCIDRs = entry.getValue().split(",");
             List<String> allowedCIDRsList = new ArrayList<String>();
             allowedCIDRsList = Arrays.asList(allowedCIDRs);

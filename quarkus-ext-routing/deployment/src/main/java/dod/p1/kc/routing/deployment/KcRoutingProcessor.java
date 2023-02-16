@@ -95,6 +95,7 @@ public class KcRoutingProcessor {
         pathRecursiveBlocksMap.forEach((k, v) -> {
           LOGGER.infof("Creating Recursive Block Routes: %s %s", k, v);
           String path = StringUtils.stripEnd(k, "/");
+          LOGGER.infof("Creating Recursive Block Routes: %s", path);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(path + "/*")
                   .handler(recorder.getHandler())
@@ -103,11 +104,8 @@ public class KcRoutingProcessor {
         recorder.setPathRecursiveBlocks(pathRecursiveBlocksMap);
 
         pathAllowsMap.forEach((k, v) -> {
-          LOGGER.infof("Creating Allow Routes: %s %s", k, v);
-          routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
-                  .route(k)
-                  .handler(recorder.getHandler())
-                  .build());
+          LOGGER.infof("Creating Allow Rules: %s %s", k, v);
+          //String path = StringUtils.stripEnd(k, "/");
         });
         recorder.setPathAllows(pathAllowsMap);
   }
