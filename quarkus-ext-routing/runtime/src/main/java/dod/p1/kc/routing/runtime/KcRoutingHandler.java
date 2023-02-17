@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
-//import java.util.stream.*;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
@@ -122,7 +121,6 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       LOGGER.debugf("Method: %s", rc.request().method());
       LOGGER.debugf("Host:  %s", rc.request().host());
       LOGGER.debugf("isSSL: %s", rc.request().isSSL());
-      //LOGGER.debugf("Headers: \n%s", rc.request().headers());
     }
     /**
      * Handler for Redirects processing.
@@ -194,20 +192,12 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
           // Below keeps ports as strings
           String localPort = String.valueOf(rc.request().localAddress().port());
           String[] portsStringArray = pathBlocksMap.get(rc.normalizedPath()).split(",");
-          List<String> portsList = new ArrayList<String>();
-          portsList = Arrays.asList(portsStringArray);
-
-          // Below is an alt to above which converts list of ports to ints for fastest compare
-          //int localPort = rc.request().localAddress().port();
-          //String portsStringArray[] = pathBlocksMap.get(rc.normalizedPath()).split(",");
-          //List<Integer> portsList = Arrays.asList(portsStringArray).stream()
-          //  .map(Integer::valueOf).collect(Collectors.toList());
+          List<String> portsList = Arrays.asList(portsStringArray);
 
           LOGGER.debugf("Blacklisted Ports: %s", portsList);
 
           if (portsList.contains(localPort)) {
               LOGGER.debugf("Port Match! Blocking Route on port %s", localPort);
-              //rc.fail(HTTP_BAD_REQUEST);
               rc.response().setStatusCode(HTTP_BAD_REQUEST).end("<html><body><h1>Resource Blocked</h1></body></html>");
           } else {
               LOGGER.debugf("Allowing Routing %s to next hop", rc.normalizedPath());
@@ -246,14 +236,13 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
               pathRecursiveBlocksMap.forEach((k2, v2) -> {
                 if (path.equals(k2) || path.startsWith(k2 + '/')) {
                   String[] portsStringArray = v2.split(",");
-                  List<String> portsList = new ArrayList<String>();
+                  List<String> portsList = new ArrayList<>();
                   portsList = Arrays.asList(portsStringArray);
 
                   LOGGER.debugf("Blacklisted Ports: %s", portsList);
 
                   if (portsList.contains(localPort)) {
                       LOGGER.debugf("Port match, Blocking Route on Port %s", localPort);
-                      //rc.fail(HTTP_BAD_REQUEST);
                       rc.response().setStatusCode(HTTP_BAD_REQUEST)
                         .end("<html><body><h1>Resource Blocked</h1></body></html>");
 
@@ -283,8 +272,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
           LOGGER.debugf("KcRoutingHandler: entry.getKey(%s)", entry.getKey());
           if (path.equals(entry.getKey()) || path.startsWith(entry.getKey() + '/')) {
             String[] allowedCIDRs = entry.getValue().split(",");
-            List<String> allowedCIDRsList = new ArrayList<String>();
-            allowedCIDRsList = Arrays.asList(allowedCIDRs);
+            List<String> allowedCIDRsList = Arrays.asList(allowedCIDRs);
             LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
             for (String i : allowedCIDRsList) {
               if (matches(hostAddress, i)) {
@@ -311,8 +299,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
 
         String hostAddress = rc.request().localAddress().hostAddress();
         String[] allowedCIDRs = pathAllowsMap.get(rc.normalizedPath()).split(",");
-        List<String> allowedCIDRsList = new ArrayList<String>();
-        allowedCIDRsList = Arrays.asList(allowedCIDRs);
+        List<String> allowedCIDRsList = Arrays.asList(allowedCIDRs);
         LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
         for (String i : allowedCIDRsList) {
           if (matches(hostAddress, i)) {

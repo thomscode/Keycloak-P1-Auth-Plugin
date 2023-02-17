@@ -103,10 +103,7 @@ public class KcRoutingProcessor {
         });
         recorder.setPathRecursiveBlocks(pathRecursiveBlocksMap);
 
-        pathAllowsMap.forEach((k, v) -> {
-          LOGGER.infof("Creating Allow Rules: %s %s", k, v);
-          //String path = StringUtils.stripEnd(k, "/");
-        });
+        pathAllowsMap.forEach((k, v) -> LOGGER.infof("Creating Allow Rules: %s %s", k, v));
         recorder.setPathAllows(pathAllowsMap);
   }
 }
