@@ -98,13 +98,14 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
      * @param  subnet
      * @return true if ip matches CIDR false if not
      */
-    private static boolean matches(final String ip, final String subnet) {
+    private static boolean ipMatchesSubnet(final String ip, final String subnet) {
       //Option 2 allows us to bring in IpAddressMatcher class if we don't want to use dependency
       //Link below should be put back together: https://stackoverflow.com/questions/577363/
       //how-to-check-if-an-ip-address-is-from-a-particular-network-netmask-in-java
-        IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(subnet);
-        return ipAddressMatcher.matches(ip);
+      IpAddressMatcher ipAddressMatcher = new IpAddressMatcher(subnet);
+      return ipAddressMatcher.matches(ip);
     }
+
     /**
      * Debug output used for troubleshooting HTTP Headers.
      * @param rc
@@ -219,45 +220,53 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       if (!isNullOrEmptyMap(pathRecursiveBlocksMap)) {
         pathRecursiveBlocksMap.forEach((k, v) -> {
           if (path.equals(k) || path.startsWith(k + '/')) {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debugf("Recursive Block Match on Path %s to Key %s checking if port matches.",
-              path, k);
-              if (!isNullOrEmptyMap(pathAllowsMap)) {
-                pathAllowsMap.forEach((k2, v2) -> {
-                  if (path.equals(k2) || path.startsWith(k2 + '/')) {
-                    LOGGER.debugf("Allow Match on Path %s to Key %s checking Value/CIDR for match to %s",
-                    path, k2, v2);
-                  }
-                });
-              }
-            }
+            loggingPathRecursiveBlocksHandler(path, k);
             if (!pathAllowsHandlerForRecursiveBlock(rc)) {
-              String localPort = String.valueOf(rc.request().localAddress().port());
-              pathRecursiveBlocksMap.forEach((k2, v2) -> {
-                if (path.equals(k2) || path.startsWith(k2 + '/')) {
-                  String[] portsStringArray = v2.split(",");
-                  List<String> portsList = new ArrayList<>();
-                  portsList = Arrays.asList(portsStringArray);
-
-                  LOGGER.debugf("Blacklisted Ports: %s", portsList);
-
-                  if (portsList.contains(localPort)) {
-                      LOGGER.debugf("Port match, Blocking Route on Port %s", localPort);
-                      rc.response().setStatusCode(HTTP_BAD_REQUEST)
-                        .end("<html><body><h1>Resource Blocked</h1></body></html>");
-
-                  } else {
-                      LOGGER.debugf("Allowing Route %s to next hop", path);
-                      rc.next();
-                  }
-                }
-              });
+              processPathRecursiveBlocksHandler(rc, path);
             }
           }
         });
       }
     }
-    /**
+
+  private static void processPathRecursiveBlocksHandler(final RoutingContext rc, final String path) {
+    String localPort = String.valueOf(rc.request().localAddress().port());
+    pathRecursiveBlocksMap.forEach((k2, v2) -> {
+      if (path.equals(k2) || path.startsWith(k2 + '/')) {
+        String[] portsStringArray = v2.split(",");
+        List<String> portsList = new ArrayList<>();
+        portsList = Arrays.asList(portsStringArray);
+
+        LOGGER.debugf("Blacklisted Ports: %s", portsList);
+
+        if (portsList.contains(localPort)) {
+            LOGGER.debugf("Port match, Blocking Route on Port %s", localPort);
+            rc.response().setStatusCode(HTTP_BAD_REQUEST)
+              .end("<html><body><h1>Resource Blocked</h1></body></html>");
+        } else {
+            LOGGER.debugf("Allowing Route %s to next hop", path);
+            rc.next();
+        }
+      }
+    });
+  }
+
+  private static void loggingPathRecursiveBlocksHandler(final String path, final String k) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debugf("Recursive Block Match on Path %s to Key %s checking if port matches.",
+              path, k);
+      if (!isNullOrEmptyMap(pathAllowsMap)) {
+        pathAllowsMap.forEach((k2, v2) -> {
+          if (path.equals(k2) || path.startsWith(k2 + '/')) {
+            LOGGER.debugf("Allow Match on Path %s to Key %s checking Value/CIDR for match to %s",
+                    path, k2, v2);
+          }
+        });
+      }
+    }
+  }
+
+  /**
      * Handler for Allows processing used with PathRecursiveBlocks.
      * @param rc
      * @return true if allow match false if no match
@@ -274,19 +283,27 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
             String[] allowedCIDRs = entry.getValue().split(",");
             List<String> allowedCIDRsList = Arrays.asList(allowedCIDRs);
             LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
-            for (String i : allowedCIDRsList) {
-              if (matches(hostAddress, i)) {
-                  LOGGER.debugf("Allow Match Found %s Routing %s to next hop", i, rc.normalizedPath());
-                  rc.next();
-                  return true;
-              }
-            }
+            return (matchFoundInCIDRsList(rc, hostAddress, allowedCIDRsList));
           }
         }
       }
       return false;
     }
-    /**
+
+  private static boolean matchFoundInCIDRsList(
+    final RoutingContext rc, final String hostAddress, final List<String> allowedCIDRsList) {
+
+    for (String i : allowedCIDRsList) {
+      if (ipMatchesSubnet(hostAddress, i)) {
+        LOGGER.debugf("Allow Match Found %s Routing %s to next hop", i, rc.normalizedPath());
+        rc.next();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
      * Handler for Allows processing.
      * @param rc
      * @return true if allow match false if no match
@@ -302,7 +319,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
         List<String> allowedCIDRsList = Arrays.asList(allowedCIDRs);
         LOGGER.debugf("Whitelisted CIDRs: %s", allowedCIDRsList);
         for (String i : allowedCIDRsList) {
-          if (matches(hostAddress, i)) {
+          if (ipMatchesSubnet(hostAddress, i)) {
               LOGGER.debugf("Allow Match Found %s Routing %s to next hop", i, rc.normalizedPath());
               rc.next();
               return true;
