@@ -93,9 +93,8 @@ public class KcRoutingProcessor {
         recorder.setPathBlocks(pathBlocksMap);
 
         pathRecursiveBlocksMap.forEach((k, v) -> {
-          LOGGER.infof("Creating Recursive Block Routes: %s %s", k, v);
           String path = StringUtils.stripEnd(k, "/");
-          LOGGER.infof("Creating Recursive Block Routes: %s", path);
+          LOGGER.infof("Creating Recursive Block Routes: %s %s", path, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
                   .route(path + "/*")
                   .handler(recorder.getHandler())
