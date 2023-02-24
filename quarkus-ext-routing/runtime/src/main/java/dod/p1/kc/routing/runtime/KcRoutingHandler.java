@@ -228,6 +228,7 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
     /**
      * Processor for Recursive Blocks Handler.
      * @param rc
+     * @param path
      */
     private static void processPathRecursiveBlocksHandler(final RoutingContext rc, final String path) {
       String localPort = String.valueOf(rc.request().localAddress().port());
@@ -312,7 +313,6 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
 
         String hostAddress = rc.request().localAddress().hostAddress();
         for (Map.Entry<String, String> entry : pathAllowsMap.entrySet()) {
-          //LOGGER.debugf("KcRoutingHandler::pathAllowsHandlerForRecursiveBlock: entry.getKey(%s)", entry.getKey());
           if (path.equals(entry.getKey()) || path.startsWith(entry.getKey())) {
             String[] allowedCIDRs = entry.getValue().split(",");
             List<String> allowedCIDRsList = Arrays.asList(allowedCIDRs);
@@ -323,9 +323,9 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       }
       return false;
     }
-
     /**
        * Matches IPs to CIDRs.
+       * @param rc
        * @param  hostAddress
        * @param  allowedCIDRsList
        * @return true if allow match false if no match
@@ -342,7 +342,6 @@ public class KcRoutingHandler implements Handler<RoutingContext> {
       }
       return false;
     }
-
     /**
      *
      * @param argpathRedirectsMap

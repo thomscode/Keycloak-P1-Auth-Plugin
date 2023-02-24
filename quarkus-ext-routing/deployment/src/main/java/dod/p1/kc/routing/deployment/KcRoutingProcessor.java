@@ -2,9 +2,9 @@ package dod.p1.kc.routing.deployment;
 import dod.p1.kc.routing.runtime.KcRoutingRecorder;
 
 import java.util.HashMap;
-import java.util.*;
+import java.util.Map;
+
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
 import io.quarkus.deployment.annotations.BuildProducer;
