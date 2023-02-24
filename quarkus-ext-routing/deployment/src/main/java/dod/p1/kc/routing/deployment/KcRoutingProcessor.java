@@ -27,6 +27,10 @@ public class KcRoutingProcessor {
      */
     private static final String FEATURE = "kc-routing";
 
+  /**
+   * Path delimiter.
+   */
+  private static final String PATH_DELIMITER = "/";
 
     /**
      *
@@ -88,7 +92,7 @@ public class KcRoutingProcessor {
         pathBlocksMap = pathBlocksMap.entrySet()
           .stream()
           .collect(Collectors.toMap(
-                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + "/",
+                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + PATH_DELIMITER,
                     Map.Entry::getValue, (prev, next) -> next, HashMap::new)
                     );
         pathBlocksMap.forEach((k, v) -> {
@@ -103,7 +107,7 @@ public class KcRoutingProcessor {
         pathRecursiveBlocksMap = pathRecursiveBlocksMap.entrySet()
           .stream()
           .collect(Collectors.toMap(
-                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + "/",
+                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + PATH_DELIMITER,
                     Map.Entry::getValue, (prev, next) -> next, HashMap::new)
                     );
         pathRecursiveBlocksMap.forEach((k, v) -> {
@@ -118,7 +122,7 @@ public class KcRoutingProcessor {
         pathAllowsMap = pathAllowsMap.entrySet()
           .stream()
           .collect(Collectors.toMap(
-                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + "/",
+                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + PATH_DELIMITER,
                     Map.Entry::getValue, (prev, next) -> next, HashMap::new)
                     );
         pathAllowsMap.forEach((k, v) -> LOGGER.infof("Creating Allow Rules: %s %s", k, v));
