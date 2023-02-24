@@ -38,12 +38,16 @@ public class RecursiveBlockThroughTest {
   @RegisterExtension
   static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar
           .addAsResource(new StringAsset(
-                  //Should Block
-                  "quarkus.kc-routing.path-block./TestWebServer=9006\n" +
-                  //Wrong Port, should not block traffic listening on 9006
-                  "quarkus.kc-routing.path-block./TestWebServer2=9005\n" +
-                  //Allow set to all of loopback CIDR shoudl allow
-                  "quarkus.kc-routing.path-block./TestWebServer3=9004,9005,9006\n" +
+                  //Should block
+                  "quarkus.kc-routing.path-recursive-block./TestWebServer=9006\n" +
+                  //Should only allow subpath
+                  "quarkus.kc-routing.path-allow./TestWebServer/suballowpath=127.0.0.0/8\n" +
+                  //Wrong port, should not block traffic listening on 9006
+                  "quarkus.kc-routing.path-recursive-block./TestWebServer2=9005\n" +
+                  //Should allow due to allow rule below
+                  "quarkus.kc-routing.path-recursive-block./TestWebServer3=9004,9005,9006\n" +
+                  "quarkus.kc-routing.path-recursive-block./TestWebServer3/sub=9004,9005,9006\n" +
+                  //Allow set to all of loopback CIDR should allow
                   "quarkus.kc-routing.path-allow./TestWebServer3=127.0.0.0/8\n"),
                   "application.properties"));
 
@@ -74,22 +78,19 @@ public class RecursiveBlockThroughTest {
   @Test
   public void testBlock() {
     RestAssured.when().get("http://localhost:9006/TestWebServer").then().statusCode(HTTP_BAD_REQUEST);
-
   }
 
   @Test
   public void testRouteThru() {
     RestAssured.when().get("http://localhost:9006/TestWebServer2").then().statusCode(HTTP_SUCCESS);
-
   }
 
   @Test
   public void testNonBlockPath() {
     RestAssured.when().get("http://localhost:9006/ShouldRoute").then().statusCode(HTTP_NOT_FOUND);
-
   }
 
-  //Below test shows parameters are not passed with blocks
+  //Should block
   @Test
   public void testBlockPathWithParameters() {
     given()
@@ -99,9 +100,8 @@ public class RecursiveBlockThroughTest {
       .get("http://localhost:9006/TestWebServer")
       .then().statusCode(HTTP_BAD_REQUEST)
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
-
   }
-  //Should not block due to path-blocks not being recursive, but no landing page
+  //Should block due to being recursive, but no landing page
   @Test
   public void testBlockPathWithParametersWithSubpath() {
     given()
@@ -109,9 +109,19 @@ public class RecursiveBlockThroughTest {
       .queryParam("testvar2", "2")
       .when()
       .get("http://localhost:9006/TestWebServer/subpath")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  //Should not block due to path-blocks not being recursive, but no landing page
+  @Test
+  public void testBlockPathWithParametersWithAllowedSubpath() {
+    given()
+      .queryParam("testvar1", "1")
+      .queryParam("testvar2", "2")
+      .when()
+      .get("http://localhost:9006/TestWebServer/suballowpath")
       .then().statusCode(HTTP_NOT_FOUND)
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
-
   }
   @Test
   public void testNonBlockPathWithParameters() {
@@ -132,7 +142,6 @@ public class RecursiveBlockThroughTest {
       .then().statusCode(HTTP_SUCCESS)
       .body(is("No parameters provided"));
   }
-
   @Test
   public void testBlockWithAllowWithParameters() {
     given()
@@ -143,7 +152,17 @@ public class RecursiveBlockThroughTest {
       .then().statusCode(HTTP_SUCCESS)
       .body(is("parameters=testvar1=1&testvar2=2"));
   }
-  //Should not block due to path-block being 1 level not due to allow, but no landing page
+  @Test
+  public void testBlockWithAllowWithParametersWithSlash() {
+    given()
+      .queryParam("testvar1", "1")
+      .queryParam("testvar2", "2")
+      .when()
+      .get("http://localhost:9006/TestWebServer3/")
+      .then().statusCode(HTTP_SUCCESS)
+      .body(is("parameters=testvar1=1&testvar2=2"));
+  }
+  //Should not block due to allow, but should return NOT FOUND due to no landing page
   @Test
   public void testBlockWithAllowWithParametersWithSubPath() {
     given()
@@ -151,6 +170,17 @@ public class RecursiveBlockThroughTest {
       .queryParam("testvar2", "2")
       .when()
       .get("http://localhost:9006/TestWebServer3/subpath")
+      .then().statusCode(HTTP_NOT_FOUND)
+      .body(is("<html><body><h1>Resource not found</h1></body></html>"));
+  }
+  //Should not block due to allow, but should return NOT FOUND due to no landing page
+  @Test
+  public void testBlockWithAllowWithParametersWithDeclaredSubPath() {
+    given()
+      .queryParam("testvar1", "1")
+      .queryParam("testvar2", "2")
+      .when()
+      .get("http://localhost:9006/TestWebServer3/sub")
       .then().statusCode(HTTP_NOT_FOUND)
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
   }

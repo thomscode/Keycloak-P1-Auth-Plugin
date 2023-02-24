@@ -2,6 +2,8 @@ package dod.p1.kc.routing.deployment;
 import dod.p1.kc.routing.runtime.KcRoutingRecorder;
 
 import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
@@ -83,6 +85,12 @@ public class KcRoutingProcessor {
         });
         recorder.setPathFilters(pathFiltersMap);
 
+        pathBlocksMap = pathBlocksMap.entrySet()
+          .stream()
+          .collect(Collectors.toMap(
+                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + "/",
+                    Map.Entry::getValue, (prev, next) -> next, HashMap::new)
+                    );
         pathBlocksMap.forEach((k, v) -> {
           LOGGER.infof("Creating Block Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
@@ -92,16 +100,27 @@ public class KcRoutingProcessor {
         });
         recorder.setPathBlocks(pathBlocksMap);
 
+        pathRecursiveBlocksMap = pathRecursiveBlocksMap.entrySet()
+          .stream()
+          .collect(Collectors.toMap(
+                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + "/",
+                    Map.Entry::getValue, (prev, next) -> next, HashMap::new)
+                    );
         pathRecursiveBlocksMap.forEach((k, v) -> {
-          String path = StringUtils.stripEnd(k, "/");
-          LOGGER.infof("Creating Recursive Block Routes: %s %s", path, v);
+          LOGGER.infof("Creating Recursive Block Routes: %s %s", k, v);
           routes.produce(nonApplicationRootPathBuildItem.routeBuilder()
-                  .route(path + "/*")
+                  .route(k + "*")
                   .handler(recorder.getHandler())
                   .build());
         });
         recorder.setPathRecursiveBlocks(pathRecursiveBlocksMap);
 
+        pathAllowsMap = pathAllowsMap.entrySet()
+          .stream()
+          .collect(Collectors.toMap(
+                    e -> e.getKey().endsWith("/") ? e.getKey() : e.getKey() + "/",
+                    Map.Entry::getValue, (prev, next) -> next, HashMap::new)
+                    );
         pathAllowsMap.forEach((k, v) -> LOGGER.infof("Creating Allow Rules: %s %s", k, v));
         recorder.setPathAllows(pathAllowsMap);
   }

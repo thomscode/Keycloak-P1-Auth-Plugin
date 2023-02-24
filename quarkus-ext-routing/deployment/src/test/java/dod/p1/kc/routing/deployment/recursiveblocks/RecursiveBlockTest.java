@@ -30,6 +30,7 @@ public class RecursiveBlockTest {
           .addAsResource(new StringAsset(
                   "quarkus.kc-routing.path-recursive-block./recursiveblock1=9006\n" +
                   "quarkus.kc-routing.path-recursive-block./recursiveblock11=9005\n" +
+                  "quarkus.kc-routing.path-recursive-block./recursiveblock111/=9006\n" +
                   "quarkus.kc-routing.path-recursive-block./recursiveblock2/=9006\n" +
                   "quarkus.kc-routing.path-recursive-block./recursiveblock3/subpath=9006\n" +
                   "quarkus.kc-routing.path-recursive-block./recursiveblock4=9005,9006\n" +
@@ -48,10 +49,26 @@ public class RecursiveBlockTest {
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
   @Test
-  public void testNonSubPath() {
+  public void testStraightWithSlash() {
+    given()
+      .when()
+      .get("http://localhost:9006/recursiveblock1/")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  @Test
+  public void testSubPath() {
     given()
       .when()
       .get("http://localhost:9006/recursiveblock1/shouldBlock")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  @Test
+  public void testSubPathWithSlash() {
+    given()
+      .when()
+      .get("http://localhost:9006/recursiveblock1/shouldBlock/")
       .then().statusCode(HTTP_BAD_REQUEST)
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
@@ -71,14 +88,22 @@ public class RecursiveBlockTest {
       .then().statusCode(HTTP_NOT_FOUND)
       .body(is("<html><body><h1>Resource not found</h1></body></html>"));
   }
-  // @Test
-  // public void testWithSlash() {
-  //   given()
-  //     .when()
-  //     .get("http://localhost:9006/recursiveblock2/")
-  //     .then().statusCode(HTTP_BAD_REQUEST)
-  //     .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
-  // }
+  @Test
+  public void testSimilarPathBetweenRoutes() {
+    given()
+      .when()
+      .get("http://localhost:9006/recursiveblock111")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
+  @Test
+  public void testWithSlash() {
+    given()
+      .when()
+      .get("http://localhost:9006/recursiveblock2/")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
   @Test
   public void testWithSubpath() {
     given()
@@ -103,14 +128,14 @@ public class RecursiveBlockTest {
       .then().statusCode(HTTP_BAD_REQUEST)
       .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
   }
-  // @Test
-  // public void testWithMultiPortsAndSlash() {
-  //   given()
-  //     .when()
-  //     .get("http://localhost:9006/recursiveblock6/")
-  //     .then().statusCode(HTTP_BAD_REQUEST)
-  //     .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
-  // }
+  @Test
+  public void testWithMultiPortsAndSlash() {
+    given()
+      .when()
+      .get("http://localhost:9006/recursiveblock6/")
+      .then().statusCode(HTTP_BAD_REQUEST)
+      .body(is("<html><body><h1>Resource Blocked</h1></body></html>"));
+  }
   @Test
   public void testWithMultiPortsAndSubpath() {
     given()
