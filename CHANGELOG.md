@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ---
 ## [3.2.0] - 2023-03-06
 ### Updated
-- Upgrade Keycloak libraries to version 21.0.0
+- Upgrade Keycloak libraries to version 21.0.1
 
 ## [3.1.0] - 2023-02-03
 ### Added

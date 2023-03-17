@@ -3,7 +3,7 @@ Because the Platform One custom provider plugin is now decoupled from the Big Ba
 
 | **PLUGIN VERSION** | **KEYCLOAK VERSION** | **KEYCLOAK VERSION**<br>**COMPATIBILITY** | **BIG BANG VERSION**<br>**COMPATIBILITY**  |
 |:-----------------|:-------------|:---------------|:---------------|
-| 3.2.0   | 21.0.0    | 21.0.X      | 1.51.0<br>1.52.0<br>1.53.0 |
+| 3.2.0   | 21.0.1    | 21.0.X      | 1.51.0<br>1.52.0<br>1.53.0 |
 | 3.1.0   | 20.0.3    | 20.0.X      | 1.51.0<br>1.52.0<br>1.53.0 |
 | 3.0.1   | 20.0.3    | 20.0.X      | 1.51.0<br>1.52.0<br>1.53.0 |
 | 3.0.0   | 20.0.1    | 20.0.X      | 1.51.0<br>1.52.0<br>1.53.0 |
