@@ -47,6 +47,14 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
     /** The set of resource types for which only the name attribute is considered in the event processing. */
     private final HashSet<ResourceType> nameOnlyResourceTypes;
 
+    // Sonarqube consider this a critical issue
+    /** COMMA_CLIENT_ID constant */
+    private final String COMMA_CLIENT_ID = ", clientId=";
+    /** COMMA_USERNAME constant*/
+    private final String COMMA_USERNAME = ", username=";
+    /** COMMA_NAME constant*/
+    private final String COMMA_NAME = ", name=";
+
     /**
      * Constructs a new instance of the event listener provider with the specified parameters.
      *
@@ -108,7 +116,7 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
             sb.append(event.getType());
             sb.append(", realmId=");
             sb.append(event.getRealmId());
-            sb.append(", clientId=");
+            sb.append(COMMA_CLIENT_ID);
             sb.append(event.getClientId());
             sb.append(", userId=");
             sb.append(event.getUserId());
@@ -153,7 +161,7 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
                   String email = user.getEmail();
 
                   if (username != null && !founduser) {
-                    sb.append(", username=");
+                    sb.append(COMMA_USERNAME);
                     sb.append(username);
                   }
                   if (email != null && !foundemail) {
@@ -191,7 +199,7 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
             sb.append(adminEvent.getResourceType());
             sb.append(", realmId=");
             sb.append(adminEvent.getAuthDetails().getRealmId());
-            sb.append(", clientId=");
+            sb.append(COMMA_CLIENT_ID);
             sb.append(adminEvent.getAuthDetails().getClientId());
             sb.append(", userId=");
             sb.append(adminEvent.getAuthDetails().getUserId());
@@ -203,7 +211,7 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
             if (adminEvent.getRepresentation() != null) {
               JSONObject representation = new JSONObject(adminEvent.getRepresentation());
               if (adminEvent.getResourceType().equals(ResourceType.GROUP)) {
-                sb.append(", name=");
+                sb.append(COMMA_NAME);
                 sb.append(representation.getString("name"));
                 if (!representation.isNull("path")) {
                   sb.append(", path=");
@@ -212,7 +220,7 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
 
               }
               if (adminEvent.getResourceType().equals(ResourceType.GROUP_MEMBERSHIP)) {
-                sb.append(", name=");
+                sb.append(COMMA_NAME);
                 sb.append(representation.getString("name"));
                 sb.append(", path=");
                 sb.append(representation.getString("path"));
@@ -220,7 +228,7 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
                 String[] resourcePath = adminEvent.getResourcePath().split("/", limit);
 
                 //UserModel user = session.users().getUserById(resourcePath[1], session.getContext().getRealm());
-                sb.append(", username=");
+                sb.append(COMMA_USERNAME);
                 sb.append(session.users().getUserById(session.getContext().getRealm(), resourcePath[1]).getUsername());
 
                 //GroupModel group = session.getContext().getRealm().getGroupById(resourcePath[3]);
@@ -228,27 +236,27 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
                 // sb.append(session.getContext().getRealm().getGroupById(resourcePath[3]).getName());
 
               } else if (adminEvent.getResourceType().equals(ResourceType.USER)) {
-                sb.append(", username=");
+                sb.append(COMMA_USERNAME);
                 sb.append(representation.getString("username"));
                 sb.append(", email=");
                 sb.append(representation.getString("email"));
               } else if (adminEvent.getResourceType().equals(ResourceType.CLIENT)) {
-                sb.append(", clientId=");
+                sb.append(COMMA_CLIENT_ID);
                 sb.append(representation.getString("clientId"));
 
                 if (!representation.isNull("name")) {
-                  sb.append(", name=");
+                  sb.append(COMMA_NAME);
                   sb.append(representation.getString("name"));
                 }
               } else if (adminEvent.getResourceType().equals(ResourceType.PROTOCOL_MAPPER)) {
-                sb.append(", name=");
+                sb.append(COMMA_NAME);
                 sb.append(representation.getString("name"));
                 sb.append(", protocol=");
                 sb.append(representation.getString("protocol"));
                 sb.append(", protocolMapper=");
                 sb.append(representation.getString("protocolMapper"));
               } else if (nameOnlyResourceTypes.contains(adminEvent.getResourceType())) {
-                sb.append(", name=");
+                sb.append(COMMA_NAME);
                 sb.append(representation.getString("name"));
               } else if (allAttrResourceTypes.contains(adminEvent.getResourceType())) {
                 sb.append(", representation=");
