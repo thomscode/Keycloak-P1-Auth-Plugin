@@ -1141,7 +1141,7 @@ public class AccountFormService extends AbstractSecuredLocalService
 
       Set<Scope> scopesToKeep = new HashSet<>();
 
-      if (isRevokePolicyAll) {
+      if (policy != null && isRevokePolicyAll) {
         for (Scope scope : policy.getScopes()) {
           policy.removeScope(scope);
         }
@@ -1154,14 +1154,16 @@ public class AccountFormService extends AbstractSecuredLocalService
                   .findById(realm, resourceServer, id.split(":")[1]));
         }
 
-        for (Scope scope : policy.getScopes()) {
-          if (!scopesToKeep.contains(scope)) {
-            policy.removeScope(scope);
+        if (policy != null) {
+          for (Scope scope : policy.getScopes()) {
+            if (!scopesToKeep.contains(scope)) {
+              policy.removeScope(scope);
+            }
           }
         }
       }
 
-      if (policy.getScopes().isEmpty()) {
+      if (policy != null && policy.getScopes().isEmpty()) {
         for (Policy associated : policy.getAssociatedPolicies()) {
           policyStore.delete(realm, associated.getId());
         }

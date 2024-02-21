@@ -221,7 +221,7 @@ public class FreeMarkerAccountProvider implements AccountProvider {
         "url",
         new UrlBean(realm, theme, baseUri, baseQueryUri, uriInfo.getRequestUri(), idTokenHint));
 
-    if (realm.isInternationalizationEnabled()) {
+    if (realm != null && realm.isInternationalizationEnabled()) {
       UriBuilder b = UriBuilder.fromUri(baseQueryUri).path(uriInfo.getPath());
       customAttributes.put("locale", new LocaleBean(realm, locale, b, messagesBundle));
     }
