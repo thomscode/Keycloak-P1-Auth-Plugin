@@ -76,13 +76,6 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
         this.logger = eventLogger;
         this.successLevel = successEvent;
         this.errorLevel = errorEvent;
-
-        // this.excludedEvents = new HashSet<EventType>();
-        // this.excludedEvents.add(EventType.REFRESH_TOKEN_ERROR);
-        // this.excludedEvents.add(EventType.REFRESH_TOKEN);
-        // this.excludedEvents.add(EventType.USER_INFO_REQUEST);
-        // this.excludedEvents.add(EventType.CUSTOM_REQUIRED_ACTION);
-        // this.excludedEvents.add(EventType.CODE_TO_TOKEN);
         this.excludedEvents = excludedEventType;
 
         this.allAttrResourceTypes = new HashSet<ResourceType>();
@@ -154,10 +147,8 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
                         sb.append("'");
                     }
                 }
-                //if (event.getUserId() != null && EventType.REGISTER.equals(event.getType())) {
                 if (event.getUserId() != null && !excludedEvents.contains(event.getType())) {
                     RealmModel realm = session.getContext().getRealm();
-                    //RealmModel realm = session.realms().getRealm(event.getRealmId());
                     UserModel user = session.users().getUserById(realm, event.getUserId());
                     String username = user.getUsername();
                     String email = user.getEmail();
@@ -229,16 +220,10 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
 
                     String[] resourcePath = adminEvent.getResourcePath().split("/", limit);
 
-                    //UserModel user = session.users().getUserById(resourcePath[1], session.getContext().getRealm());
                     sb.append(COMMA_USERNAME);
                     sb.append(
                             session.users().getUserById(session.getContext().getRealm(), resourcePath[1]).getUsername()
                     );
-
-                    //GroupModel group = session.getContext().getRealm().getGroupById(resourcePath[3]);
-                    // sb.append(", groupname=");
-                    // sb.append(session.getContext().getRealm().getGroupById(resourcePath[3]).getName());
-
                 } else if (adminEvent.getResourceType().equals(ResourceType.USER)) {
                     sb.append(COMMA_USERNAME);
                     sb.append(representation.getString("username"));
@@ -275,7 +260,6 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
 
             if (adminEvent.getAuthDetails().getUserId() != null) {
                 RealmModel realm = session.getContext().getRealm();
-                //RealmModel realm = session.realms().getRealm(event.getRealmId());
                 UserModel user = session.users().getUserById(realm, adminEvent.getAuthDetails().getUserId());
                 String username = user.getUsername();
                 String email = user.getEmail();

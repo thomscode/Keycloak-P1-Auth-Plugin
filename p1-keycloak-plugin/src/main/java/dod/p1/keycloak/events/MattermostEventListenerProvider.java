@@ -1,7 +1,5 @@
 package dod.p1.keycloak.events;
 
-import okhttp3.RequestBody;
-import okhttp3.FormBody;
 import org.jboss.logging.Logger;
 
 import org.keycloak.events.Event;
@@ -134,9 +132,6 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
      */
 
     private void send(final String stringEvent) {
-        RequestBody formBody = new FormBody.Builder()
-                  .add("json", stringEvent)
-                  .build();
         try {
           Slack slack = Slack.getInstance();
           String webhookUrl  = this.serverUri;
@@ -149,7 +144,6 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
           LOGGER.info(response); // WebhookResponse(code=200, message=OK, body=ok)
         } catch (IOException e) {
           LOGGER.error("UH OH!! " + e.toString());
-          //e.printStackTrace();
           return;
         }
 
@@ -163,7 +157,7 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
      */
     private String toString(final AdminEvent adminEvent) {
         StringBuilder sb = new StringBuilder();
-        String repPath = new String();
+        String repPath = "";
         final int limit = 4;
 
         sb.append("operationType=");

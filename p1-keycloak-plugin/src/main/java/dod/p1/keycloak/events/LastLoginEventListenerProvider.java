@@ -22,9 +22,6 @@ import java.time.format.DateTimeFormatter;
  */
 public class LastLoginEventListenerProvider implements EventListenerProvider {
 
-    /** Logger for the LastLoginEventListenerProvider class. */
-    private static final Logger LOGGER = Logger.getLogger(LastLoginEventListenerProvider.class);
-
     /** The Keycloak session. */
     private final KeycloakSession session;
 
@@ -54,14 +51,10 @@ public class LastLoginEventListenerProvider implements EventListenerProvider {
     public void onEvent(final Event event) {
 
         if (EventType.LOGIN.equals(event.getType())) {
-            //log.infof("LastLoginEventListenerProvider: ## NEW %s EVENT", event.getType());
-            //log.info("-----------------------------------------------------------");
-
             RealmModel realm = this.model.getRealm(event.getRealmId());
             UserModel user = this.session.users().getUserById(realm, event.getUserId());
 
             if (user != null) {
-                //log.info("Updating last login status for user: " + event.getUserId());
 
                 Map<String, List<String>> userAttrs = user.getAttributes();
                 if (userAttrs.containsKey(LASTLOGIN)) {

@@ -22,50 +22,40 @@ import static dod.p1.keycloak.common.CommonConfig.getInstance;
 import static dod.p1.keycloak.registration.X509Tools.isX509Registered;
 import static dod.p1.keycloak.registration.X509Tools.getX509Username;
 
+/**
+ * Implementation of RequiredActionProvider and RequiredActionFactory for updating X509 certificates.
+ */
 public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory {
 
-      /**
-     * Logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(UpdateX509.class);
-
-    /**
-     * Provider id.
-     */
+    /** Provider id. */
     private static final String PROVIDER_ID = "UPDATE_X509";
-    /**
-     * Ignore x509.
-     */
+
+    /** Ignore x509. */
     private static final String IGNORE_X509 = "IGNORE_X509";
 
     /**
-     * Custom implementation.
+     * Evaluates triggers for the X509 update process.
+     *
+     * @param context The RequiredActionContext providing context information.
      */
      @Override
      public void evaluateTriggers(final RequiredActionContext context) {
-         //LOGGER.debugf("UpdateX509::evaluateTriggers");
          String ignore = context.getAuthenticationSession().getAuthNote(IGNORE_X509);
          String x509Username = getX509Username(context);
          if (x509Username == null || ignore != null && ignore.equals("true")) {
-             //LOGGER.debugf("UpdateX509::evaluateTriggers x509Username == null");
              return;
          }
 
          RealmModel realm = context.getRealm();
          KeycloakSession session = context.getSession();
-         AuthenticationSessionModel authenticationSession = context.getAuthenticationSession();
 
-         X509Certificate[] certAttribute = context.getHttpRequest().getClientCertificateChain();
          Map<String, List<String>> userAttrs = context.getUser().getAttributes();
          if (userAttrs.containsKey("usercertificate")) {
              List<String> identity = userAttrs.get("usercertificate");
              if (identity != null && !identity.isEmpty()) {
-                 //LOGGER.debugf("UpdateX509::evaluateTriggers: usercertificate: %s", identity);
                  context.getUser().setSingleAttribute(
                          getInstance(session, realm).getUserActive509Attribute(),
                          identity.get(0));
-                 // LOGGER.debugf("UpdateX509::evaluateTriggers: activecac: %s",
-                 //   getInstance(session, realm).getUserActive509Attribute());
              }
          }
 
@@ -76,7 +66,9 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
      }
 
     /**
-     * Custom implementation.
+     * Initiates the challenge for the X509 update process.
+     *
+     * @param context The RequiredActionContext providing context information.
      */
     @Override
     public void requiredActionChallenge(final RequiredActionContext context) {
@@ -91,7 +83,9 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Processes the action during the X509 update process.
+     *
+     * @param context The RequiredActionContext providing context information.
      */
     @Override
     public void processAction(final RequiredActionContext context) {
@@ -114,7 +108,9 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Gets the display text for the X509 update process.
+     *
+     * @return The display text.
      */
     @Override
     public String getDisplayText() {
@@ -122,7 +118,9 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Indicates whether the X509 update action is one-time or persistent.
+     *
+     * @return True if the action is one-time, false otherwise.
      */
     @Override
     public boolean isOneTimeAction() {
@@ -130,7 +128,10 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Creates an instance of the X509 update provider.
+     *
+     * @param session The KeycloakSession.
+     * @return The RequiredActionProvider instance.
      */
     @Override
     public RequiredActionProvider create(final KeycloakSession session) {
@@ -138,7 +139,9 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Initializes the X509 update provider.
+     *
+     * @param config The configuration scope.
      */
     @Override
     public void init(final Config.Scope config) {
@@ -146,7 +149,9 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Performs post-initialization tasks for the X509 update provider.
+     *
+     * @param factory The KeycloakSessionFactory.
      */
     @Override
     public void postInit(final KeycloakSessionFactory factory) {
@@ -154,7 +159,7 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Closes the X509 update provider.
      */
     @Override
     public void close() {
@@ -162,7 +167,9 @@ public class UpdateX509 implements RequiredActionProvider, RequiredActionFactory
     }
 
     /**
-     * Custom implementation.
+     * Gets the provider id for the X509 update provider.
+     *
+     * @return The provider id.
      */
     @Override
     public String getId() {
