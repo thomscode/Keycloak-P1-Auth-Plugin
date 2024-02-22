@@ -252,19 +252,25 @@ public class FreeMarkerAccountProvider implements AccountProvider {
         customAttributes.put("sessions", new SessionsBean(realm, sessions));
         break;
       case APPLICATIONS:
-      customAttributes.put("applications", new ApplicationsBean(session, realm, user));
+        customAttributes.put("applications", new ApplicationsBean(session, realm, user));
         customAttributes.put("advancedMsg", new AdvancedMessageFormatterMethod(locale, messagesBundle));
         break;
       case PASSWORD:
         customAttributes.put("password", new PasswordBean(passwordSet));
         break;
-      case RESOURCES, RESOURCE_DETAIL:
+      case RESOURCES:
         if (realm != null && !realm.isUserManagedAccessAllowed()) {
           return Response.status(Status.FORBIDDEN).build();
         }
         customAttributes.put("authorization", new AuthorizationBean(session, realm, user, uriInfo));
         break;
-        default:
+      case RESOURCE_DETAIL:
+        if (realm != null && !realm.isUserManagedAccessAllowed()) {
+          return Response.status(Status.FORBIDDEN).build();
+        }
+        customAttributes.put("authorization", new AuthorizationBean(session, realm, user, uriInfo));
+        break;
+      default:
         // Handle unknown page or provide a default behavior
         break;
     }

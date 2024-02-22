@@ -48,12 +48,14 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
     private final HashSet<ResourceType> nameOnlyResourceTypes;
 
     // Sonarqube consider this a critical issue
-    /** COMMA_CLIENT_ID constant */
-    private final String COMMA_CLIENT_ID = ", clientId=";
-    /** COMMA_USERNAME constant*/
-    private final String COMMA_USERNAME = ", username=";
-    /** COMMA_NAME constant*/
-    private final String COMMA_NAME = ", name=";
+    /** COMMA_CLIENT_ID constant. */
+    private static final String COMMA_CLIENT_ID = ", clientId=";
+
+    /** COMMA_USERNAME constant. */
+    private static final String COMMA_USERNAME = ", username=";
+
+    /** COMMA_NAME constant. */
+    private static final String COMMA_NAME = ", name=";
 
     /**
      * Constructs a new instance of the event listener provider with the specified parameters.
@@ -134,12 +136,12 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
                 boolean foundemail = false;
 
                 for (Map.Entry<String, String> e : event.getDetails().entrySet()) {
-                  if (e.getKey().equals("username")) {
-                      founduser = true;
-                  }
-                  if (e.getKey().equals("email")) {
-                      foundemail = true;
-                  }
+                    if (e.getKey().equals("username")) {
+                        founduser = true;
+                    }
+                    if (e.getKey().equals("email")) {
+                        foundemail = true;
+                    }
 
                     sb.append(", ");
                     sb.append(e.getKey());
@@ -154,20 +156,20 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
                 }
                 //if (event.getUserId() != null && EventType.REGISTER.equals(event.getType())) {
                 if (event.getUserId() != null && !excludedEvents.contains(event.getType())) {
-                  RealmModel realm = session.getContext().getRealm();
-                  //RealmModel realm = session.realms().getRealm(event.getRealmId());
-                  UserModel user = session.users().getUserById(realm, event.getUserId());
-                  String username = user.getUsername();
-                  String email = user.getEmail();
+                    RealmModel realm = session.getContext().getRealm();
+                    //RealmModel realm = session.realms().getRealm(event.getRealmId());
+                    UserModel user = session.users().getUserById(realm, event.getUserId());
+                    String username = user.getUsername();
+                    String email = user.getEmail();
 
-                  if (username != null && !founduser) {
-                    sb.append(COMMA_USERNAME);
-                    sb.append(username);
-                  }
-                  if (email != null && !foundemail) {
-                    sb.append(", email=");
-                    sb.append(email);
-                  }
+                    if (username != null && !founduser) {
+                        sb.append(COMMA_USERNAME);
+                        sb.append(username);
+                    }
+                    if (email != null && !foundemail) {
+                        sb.append(", email=");
+                        sb.append(email);
+                    }
                 }
             }
 
@@ -209,59 +211,61 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
             sb.append(adminEvent.getResourcePath());
 
             if (adminEvent.getRepresentation() != null) {
-              JSONObject representation = new JSONObject(adminEvent.getRepresentation());
-              if (adminEvent.getResourceType().equals(ResourceType.GROUP)) {
-                sb.append(COMMA_NAME);
-                sb.append(representation.getString("name"));
-                if (!representation.isNull("path")) {
-                  sb.append(", path=");
-                  sb.append(representation.getString("path"));
+                JSONObject representation = new JSONObject(adminEvent.getRepresentation());
+                if (adminEvent.getResourceType().equals(ResourceType.GROUP)) {
+                    sb.append(COMMA_NAME);
+                    sb.append(representation.getString("name"));
+                    if (!representation.isNull("path")) {
+                        sb.append(", path=");
+                        sb.append(representation.getString("path"));
+                    }
+
                 }
+                if (adminEvent.getResourceType().equals(ResourceType.GROUP_MEMBERSHIP)) {
+                    sb.append(COMMA_NAME);
+                    sb.append(representation.getString("name"));
+                    sb.append(", path=");
+                    sb.append(representation.getString("path"));
 
-              }
-              if (adminEvent.getResourceType().equals(ResourceType.GROUP_MEMBERSHIP)) {
-                sb.append(COMMA_NAME);
-                sb.append(representation.getString("name"));
-                sb.append(", path=");
-                sb.append(representation.getString("path"));
+                    String[] resourcePath = adminEvent.getResourcePath().split("/", limit);
 
-                String[] resourcePath = adminEvent.getResourcePath().split("/", limit);
+                    //UserModel user = session.users().getUserById(resourcePath[1], session.getContext().getRealm());
+                    sb.append(COMMA_USERNAME);
+                    sb.append(
+                            session.users().getUserById(session.getContext().getRealm(), resourcePath[1]).getUsername()
+                    );
 
-                //UserModel user = session.users().getUserById(resourcePath[1], session.getContext().getRealm());
-                sb.append(COMMA_USERNAME);
-                sb.append(session.users().getUserById(session.getContext().getRealm(), resourcePath[1]).getUsername());
+                    //GroupModel group = session.getContext().getRealm().getGroupById(resourcePath[3]);
+                    // sb.append(", groupname=");
+                    // sb.append(session.getContext().getRealm().getGroupById(resourcePath[3]).getName());
 
-                //GroupModel group = session.getContext().getRealm().getGroupById(resourcePath[3]);
-                // sb.append(", groupname=");
-                // sb.append(session.getContext().getRealm().getGroupById(resourcePath[3]).getName());
+                } else if (adminEvent.getResourceType().equals(ResourceType.USER)) {
+                    sb.append(COMMA_USERNAME);
+                    sb.append(representation.getString("username"));
+                    sb.append(", email=");
+                    sb.append(representation.getString("email"));
+                } else if (adminEvent.getResourceType().equals(ResourceType.CLIENT)) {
+                    sb.append(COMMA_CLIENT_ID);
+                    sb.append(representation.getString("clientId"));
 
-              } else if (adminEvent.getResourceType().equals(ResourceType.USER)) {
-                sb.append(COMMA_USERNAME);
-                sb.append(representation.getString("username"));
-                sb.append(", email=");
-                sb.append(representation.getString("email"));
-              } else if (adminEvent.getResourceType().equals(ResourceType.CLIENT)) {
-                sb.append(COMMA_CLIENT_ID);
-                sb.append(representation.getString("clientId"));
-
-                if (!representation.isNull("name")) {
-                  sb.append(COMMA_NAME);
-                  sb.append(representation.getString("name"));
+                    if (!representation.isNull("name")) {
+                        sb.append(COMMA_NAME);
+                        sb.append(representation.getString("name"));
+                    }
+                } else if (adminEvent.getResourceType().equals(ResourceType.PROTOCOL_MAPPER)) {
+                    sb.append(COMMA_NAME);
+                    sb.append(representation.getString("name"));
+                    sb.append(", protocol=");
+                    sb.append(representation.getString("protocol"));
+                    sb.append(", protocolMapper=");
+                    sb.append(representation.getString("protocolMapper"));
+                } else if (nameOnlyResourceTypes.contains(adminEvent.getResourceType())) {
+                    sb.append(COMMA_NAME);
+                    sb.append(representation.getString("name"));
+                } else if (allAttrResourceTypes.contains(adminEvent.getResourceType())) {
+                    sb.append(", representation=");
+                    sb.append(adminEvent.getRepresentation());
                 }
-              } else if (adminEvent.getResourceType().equals(ResourceType.PROTOCOL_MAPPER)) {
-                sb.append(COMMA_NAME);
-                sb.append(representation.getString("name"));
-                sb.append(", protocol=");
-                sb.append(representation.getString("protocol"));
-                sb.append(", protocolMapper=");
-                sb.append(representation.getString("protocolMapper"));
-              } else if (nameOnlyResourceTypes.contains(adminEvent.getResourceType())) {
-                sb.append(COMMA_NAME);
-                sb.append(representation.getString("name"));
-              } else if (allAttrResourceTypes.contains(adminEvent.getResourceType())) {
-                sb.append(", representation=");
-                sb.append(adminEvent.getRepresentation());
-              }
             }
 
             if (adminEvent.getError() != null) {
@@ -270,20 +274,20 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
             }
 
             if (adminEvent.getAuthDetails().getUserId() != null) {
-              RealmModel realm = session.getContext().getRealm();
-              //RealmModel realm = session.realms().getRealm(event.getRealmId());
-              UserModel user = session.users().getUserById(realm, adminEvent.getAuthDetails().getUserId());
-              String username = user.getUsername();
-              String email = user.getEmail();
+                RealmModel realm = session.getContext().getRealm();
+                //RealmModel realm = session.realms().getRealm(event.getRealmId());
+                UserModel user = session.users().getUserById(realm, adminEvent.getAuthDetails().getUserId());
+                String username = user.getUsername();
+                String email = user.getEmail();
 
-              if (username != null) {
-                sb.append(", Admin_username=");
-                sb.append(username);
-              }
-              if (email != null) {
-                sb.append(", Admin_email=");
-                sb.append(email);
-              }
+                if (username != null) {
+                    sb.append(", Admin_username=");
+                    sb.append(username);
+                }
+                if (email != null) {
+                    sb.append(", Admin_email=");
+                    sb.append(email);
+                }
 
             }
 
