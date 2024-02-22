@@ -31,6 +31,10 @@ public class LastLoginEventListenerProvider implements EventListenerProvider {
     /** The realm provider. */
     private final RealmProvider model;
 
+    // Sonarqube consider this a critical issue
+    /** LASTLOGIN constant. */
+    private static final String LASTLOGIN = "lastlogin";
+
     /**
      * Constructs a new LastLoginEventListenerProvider instance with the provided Keycloak session.
      *
@@ -60,8 +64,8 @@ public class LastLoginEventListenerProvider implements EventListenerProvider {
                 //log.info("Updating last login status for user: " + event.getUserId());
 
                 Map<String, List<String>> userAttrs = user.getAttributes();
-                if (userAttrs.containsKey("lastlogin")) {
-                    List<String> userLastLogin = userAttrs.get("lastlogin");
+                if (userAttrs.containsKey(LASTLOGIN)) {
+                    List<String> userLastLogin = userAttrs.get(LASTLOGIN);
                     if (userLastLogin != null && !userLastLogin.isEmpty()) {
                         user.setSingleAttribute("priorlogin", userLastLogin.get(0));
                     }
@@ -70,7 +74,7 @@ public class LastLoginEventListenerProvider implements EventListenerProvider {
                 // Use current server time for login event
                 OffsetDateTime loginTime = OffsetDateTime.now(ZoneOffset.UTC);
                 String loginTimeS = DateTimeFormatter.ISO_INSTANT.format(loginTime);
-                user.setSingleAttribute("lastlogin", loginTimeS);
+                user.setSingleAttribute(LASTLOGIN, loginTimeS);
             }
         }
     }
@@ -83,6 +87,7 @@ public class LastLoginEventListenerProvider implements EventListenerProvider {
      */
     @Override
     public void onEvent(final AdminEvent adminEvent, final boolean includeRepresentation) {
+        // Handles the incoming admin event (unused in this implementation).
     }
 
     /**

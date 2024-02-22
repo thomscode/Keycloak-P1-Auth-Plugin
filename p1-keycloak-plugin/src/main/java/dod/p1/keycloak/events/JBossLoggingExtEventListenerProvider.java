@@ -304,6 +304,7 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
      */
     @Override
     public void close() {
+        // Closes the event listener provider.
     }
 
     /**
