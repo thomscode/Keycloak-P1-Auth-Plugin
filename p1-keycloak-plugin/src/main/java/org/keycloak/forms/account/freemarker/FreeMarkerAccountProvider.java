@@ -706,5 +706,7 @@ public class FreeMarkerAccountProvider implements AccountProvider {
    * Closes the account provider.
    */
   @Override
-  public void close() { }
+  public void close() {
+    // Closes the account provider.
+  }
 }

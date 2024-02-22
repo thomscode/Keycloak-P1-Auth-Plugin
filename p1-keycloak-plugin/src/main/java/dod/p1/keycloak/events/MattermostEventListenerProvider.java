@@ -56,6 +56,10 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
     /** Set of name-only resource types used by MattermostEventListenerProvider. */
     private final HashSet<ResourceType> nameOnlyResourceTypes;
 
+    // Sonarqube consider this a critical issue
+    /** COMMA_NAME constant. */
+    private static final String COMMA_NAME = ", name=";
+
     /**
      * Constructs a new MattermostEventListenerProvider.
      *
@@ -180,7 +184,7 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
         if (adminEvent.getRepresentation() != null) {
           JSONObject representation = new JSONObject(adminEvent.getRepresentation());
           if (adminEvent.getResourceType().equals(ResourceType.GROUP)) {
-            sb.append(", name=");
+            sb.append(COMMA_NAME);
             sb.append(representation.getString("name"));
             if (!representation.isNull("path")) {
               sb.append(", path=");
@@ -191,7 +195,7 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
           if (adminEvent.getResourceType().equals(ResourceType.GROUP_MEMBERSHIP)) {
             LOGGER.info("groups: " + groups);
             LOGGER.info("path: " + representation.getString("path"));
-            sb.append(", name=");
+            sb.append(COMMA_NAME);
             sb.append(representation.getString("name"));
             sb.append(", path=");
             sb.append(representation.getString("path"));
@@ -211,18 +215,18 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
             sb.append(representation.getString("clientId"));
 
           if (!representation.isNull("name")) {
-              sb.append(", name=");
+              sb.append(COMMA_NAME);
               sb.append(representation.getString("name"));
             }
           } else if (adminEvent.getResourceType().equals(ResourceType.PROTOCOL_MAPPER)) {
-            sb.append(", name=");
+            sb.append(COMMA_NAME);
             sb.append(representation.getString("name"));
             sb.append(", protocol=");
             sb.append(representation.getString("protocol"));
             sb.append(", protocolMapper=");
             sb.append(representation.getString("protocolMapper"));
           } else if (nameOnlyResourceTypes.contains(adminEvent.getResourceType())) {
-            sb.append(", name=");
+            sb.append(COMMA_NAME);
             sb.append(representation.getString("name"));
           } else if (allAttrResourceTypes.contains(adminEvent.getResourceType())) {
             sb.append(", representation=");
