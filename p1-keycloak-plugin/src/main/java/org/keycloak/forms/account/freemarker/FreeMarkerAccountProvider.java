@@ -464,7 +464,7 @@ public class FreeMarkerAccountProvider implements AccountProvider {
   @Override
   public AccountProvider setError(
       final Response.Status responseStatus, final String errorMessage, final Object... parameters) {
-    this.status = status;
+    this.status = responseStatus;
     setMessage(MessageType.ERROR, errorMessage, parameters);
     return this;
   }
