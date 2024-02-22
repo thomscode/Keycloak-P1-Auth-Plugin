@@ -319,7 +319,7 @@ public class AccountFormServiceTest {
     @Test
     public void testIsPasswordSet(){
         // isPasswordSet test
-        assertTrue(AccountFormService.isPasswordSet(keycloakSession, realmModel, userModel));
+        assertTrue(AccountFormService.isPasswordSet(userModel));
     }
 
     @Test

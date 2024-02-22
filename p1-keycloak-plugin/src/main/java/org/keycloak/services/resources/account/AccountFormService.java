@@ -469,7 +469,7 @@ public class AccountFormService extends AbstractSecuredLocalService
   @GET
   public Response passwordPage() {
     if (auth != null) {
-      account.setPasswordSet(isPasswordSet(session, realm, auth.getUser()));
+      account.setPasswordSet(isPasswordSet(auth.getUser()));
     }
 
     return forwardToPage(PASSWORD, AccountPages.PASSWORD);
@@ -825,7 +825,7 @@ public class AccountFormService extends AbstractSecuredLocalService
     csrfCheck(formData);
     UserModel user = auth.getUser();
 
-    boolean requireCurrent = isPasswordSet(session, realm, user);
+    boolean requireCurrent = isPasswordSet(user);
     account.setPasswordSet(requireCurrent);
 
     String password = formData.getFirst(PASSWORD);
@@ -1019,7 +1019,7 @@ public class AccountFormService extends AbstractSecuredLocalService
           // authenticate
           if (session.users().getFederatedIdentitiesStream(realm, user).count() > 1
               || user.getFederationLink() != null
-              || isPasswordSet(session, realm, user)) {
+              || isPasswordSet(user)) {
             session.users().removeFederatedIdentity(realm, user, providerId);
 
             LOGGER.debugv(
@@ -1208,23 +1208,21 @@ public class AccountFormService extends AbstractSecuredLocalService
       while (iterator.hasNext()) {
         PermissionTicket ticket = iterator.next();
 
-        if (isGrant) {
-          if (permissionId != null
-              && permissionId.length > 0
-              && !Arrays.asList(permissionId).contains(ticket.getId())) {
-            continue;
-          }
+        if (isGrant
+                && permissionId != null
+                && permissionId.length > 0
+                && !Arrays.asList(permissionId).contains(ticket.getId())) {
+          continue;
         }
 
         if (isGrant && !ticket.isGranted()) {
           ticket.setGrantedTimestamp(System.currentTimeMillis());
           iterator.remove();
-        } else if (isDeny || isRevoke) {
-          if (permissionId != null
-              && permissionId.length > 0
-              && Arrays.asList(permissionId).contains(ticket.getId())) {
+        } else if ((isDeny || isRevoke)
+                && permissionId != null
+                && permissionId.length > 0
+                && Arrays.asList(permissionId).contains(ticket.getId())) {
             iterator.remove();
-          }
         }
       }
 
@@ -1443,12 +1441,10 @@ public class AccountFormService extends AbstractSecuredLocalService
   /**
    * Checks if a password is set for the user.
    *
-   * @param session The Keycloak session.
-   * @param realm   The realm model.
    * @param user    The user model.
    * @return {@code true} if a password is set, {@code false} otherwise.
    */
-  public static boolean isPasswordSet(final KeycloakSession session, final RealmModel realm, final UserModel user) {
+  public static boolean isPasswordSet(final UserModel user) {
     return user.credentialManager().isConfiguredFor(PasswordCredentialModel.TYPE);
   }
 
@@ -1478,13 +1474,11 @@ public class AccountFormService extends AbstractSecuredLocalService
         }
         return new String[] {referrerName, referrerUri};
       }
-    } else if (referrerUri != null) {
-      if (client != null) {
-        referrerUri = RedirectUtils.verifyRedirectUri(session, referrerUri, client);
+    } else if (referrerUri != null && client != null) {
+      referrerUri = RedirectUtils.verifyRedirectUri(session, referrerUri, client);
 
-        if (referrerUri != null) {
-          return new String[] {referrer, referrerUri};
-        }
+      if (referrerUri != null) {
+        return new String[] {referrer, referrerUri};
       }
     }
 

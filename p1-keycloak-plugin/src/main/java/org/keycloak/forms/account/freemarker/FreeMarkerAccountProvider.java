@@ -259,11 +259,6 @@ public class FreeMarkerAccountProvider implements AccountProvider {
         customAttributes.put("password", new PasswordBean(passwordSet));
         break;
       case RESOURCES:
-        if (realm != null && !realm.isUserManagedAccessAllowed()) {
-          return Response.status(Status.FORBIDDEN).build();
-        }
-        customAttributes.put("authorization", new AuthorizationBean(session, realm, user, uriInfo));
-        break;
       case RESOURCE_DETAIL:
         if (realm != null && !realm.isUserManagedAccessAllowed()) {
           return Response.status(Status.FORBIDDEN).build();

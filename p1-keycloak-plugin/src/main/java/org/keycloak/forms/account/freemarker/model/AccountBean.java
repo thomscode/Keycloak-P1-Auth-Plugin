@@ -129,7 +129,6 @@ public class AccountBean {
    * @return A map of custom attributes.
    */
   public Map<String, String> getAttributes() {
-    //return profileFormData != null ? attributes : Collections.emptyMap();
     // attributes is never null, it can be empty, but it will never be null (check line 49)
     return !attributes.isEmpty() ? attributes : Collections.emptyMap();
   }
