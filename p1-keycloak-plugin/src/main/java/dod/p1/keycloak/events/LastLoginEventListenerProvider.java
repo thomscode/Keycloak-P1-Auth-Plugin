@@ -1,6 +1,5 @@
 package dod.p1.keycloak.events;
 
-import org.jboss.logging.Logger;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
 import org.keycloak.events.EventType;

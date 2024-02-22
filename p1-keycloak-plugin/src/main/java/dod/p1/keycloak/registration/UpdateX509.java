@@ -2,7 +2,6 @@ package dod.p1.keycloak.registration;
 
 import java.util.List;
 import java.util.Map;
-import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
@@ -11,12 +10,10 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.sessions.AuthenticationSessionModel;
 
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
-import java.security.cert.X509Certificate;
 
 import static dod.p1.keycloak.common.CommonConfig.getInstance;
 import static dod.p1.keycloak.registration.X509Tools.isX509Registered;
