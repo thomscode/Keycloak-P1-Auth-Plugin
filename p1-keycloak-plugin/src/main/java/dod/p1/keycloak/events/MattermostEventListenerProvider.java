@@ -36,9 +36,6 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
     /** The logger for logging events in the MattermostEventListenerProvider. */
     private static final Logger LOGGER = Logger.getLogger(MattermostEventListenerProvider.class);
 
-    /** Set of excluded Keycloak events in MattermostEventListenerProvider. */
-    private HashSet<EventType> excludedEvents;
-
     /** Set of included admin Keycloak events in MattermostEventListenerProvider. */
     private HashSet<ResourceType> includedAdminEvents;
 
@@ -74,7 +71,6 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
             final String serverURI,
             final KeycloakSession keycloakSession) {
         this.session = keycloakSession;
-        this.excludedEvents = excludedEventSet;
         this.includedAdminEvents = includedAdminEventSet;
         this.serverUri = serverURI;
         this.groups = groupArray;
