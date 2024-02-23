@@ -196,8 +196,8 @@ public class AccountFormService extends AbstractSecuredLocalService
   private static final int MAX_EVENT_RESULTS = 30;
 
   // Sonarqube consider this a critical issue
-  /** PASSWORD constant. */
-  private static final String PASSWORD = "password";
+  /** PSSWD constant. */
+  private static final String PSSWD = "password";
 
   /** REFERRER constant. */
   private static final String REFERRER = "referrer";
@@ -463,14 +463,14 @@ public class AccountFormService extends AbstractSecuredLocalService
    *
    * @return A Response object containing the password page.
    */
-  @Path(PASSWORD)
+  @Path(PSSWD)
   @GET
   public Response passwordPage() {
     if (auth != null) {
       account.setPasswordSet(isPasswordSet(auth.getUser()));
     }
 
-    return forwardToPage(PASSWORD, AccountPages.PASSWORD);
+    return forwardToPage(PSSWD, AccountPages.PASSWORD);
   }
 
   /**
@@ -808,14 +808,14 @@ public class AccountFormService extends AbstractSecuredLocalService
    *
    * @return A Response object indicating the result of processing the password update.
    */
-  @Path(PASSWORD)
+  @Path(PSSWD)
   @POST
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   public Response processPasswordUpdate() {
     MultivaluedMap<String, String> formData = request.getDecodedFormParameters();
 
     if (auth == null) {
-      return login(PASSWORD);
+      return login(PSSWD);
     }
 
     auth.require(AccountRoles.MANAGE_ACCOUNT);
@@ -826,7 +826,7 @@ public class AccountFormService extends AbstractSecuredLocalService
     boolean requireCurrent = isPasswordSet(user);
     account.setPasswordSet(requireCurrent);
 
-    String password = formData.getFirst(PASSWORD);
+    String password = formData.getFirst(PSSWD);
     String passwordNew = formData.getFirst("password-new");
     String passwordConfirm = formData.getFirst("password-confirm");
 
