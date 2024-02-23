@@ -60,7 +60,7 @@ public class AccountBean {
 
     for (Map.Entry<String, List<String>> attr : userModel.getAttributes().entrySet()) {
       List<String> attrValue = attr.getValue();
-      if (attrValue.size() > 0) {
+      if (!attrValue.isEmpty()) {
         attributes.put(attr.getKey(), attrValue.get(0));
       }
 

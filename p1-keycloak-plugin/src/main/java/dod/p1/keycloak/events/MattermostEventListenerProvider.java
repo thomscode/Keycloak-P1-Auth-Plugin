@@ -79,14 +79,14 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
         this.serverUri = serverURI;
         this.groups = groupArray;
 
-        this.allAttrResourceTypes = new HashSet<ResourceType>();
+        this.allAttrResourceTypes = new HashSet<>();
         this.allAttrResourceTypes.add(ResourceType.AUTH_EXECUTION);
         this.allAttrResourceTypes.add(ResourceType.AUTH_FLOW);
         this.allAttrResourceTypes.add(ResourceType.AUTHENTICATOR_CONFIG);
         this.allAttrResourceTypes.add(ResourceType.REQUIRED_ACTION);
         this.allAttrResourceTypes.add(ResourceType.REALM_ROLE_MAPPING);
 
-        this.nameOnlyResourceTypes = new HashSet<ResourceType>();
+        this.nameOnlyResourceTypes = new HashSet<>();
         this.nameOnlyResourceTypes.add(ResourceType.CLIENT_ROLE);
         this.nameOnlyResourceTypes.add(ResourceType.CLIENT_SCOPE_MAPPING);
         this.nameOnlyResourceTypes.add(ResourceType.CLIENT_ROLE_MAPPING);
@@ -103,9 +103,6 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
     @Override
     public void onEvent(final Event event) {
         // Ignore excluded events
-        if (excludedEvents != null && excludedEvents.contains(event.getType())) {
-            return;
-        }
       }
 
     /**
@@ -144,7 +141,6 @@ public class MattermostEventListenerProvider implements EventListenerProvider {
           LOGGER.info(response); // WebhookResponse(code=200, message=OK, body=ok)
         } catch (IOException e) {
           LOGGER.error("UH OH!! " + e.toString());
-          return;
         }
 
     }

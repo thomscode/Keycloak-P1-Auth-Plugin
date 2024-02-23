@@ -310,12 +310,10 @@ public class AccountFormService extends AbstractSecuredLocalService
    * @return A UriBuilder for the account service base URL.
    */
   public static UriBuilder accountServiceBaseUrl(final UriInfo uriInfo) {
-    UriBuilder base =
-        uriInfo
+        return uriInfo
             .getBaseUriBuilder()
             .path(RealmsResource.class)
             .path(RealmsResource.class, "getAccountService");
-    return base;
   }
 
   /**

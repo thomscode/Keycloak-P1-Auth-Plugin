@@ -101,7 +101,7 @@ public class TotpBean {
         this.otpCredentials = otpCredentialList;
       }
     } else {
-      this.otpCredentials = Collections.EMPTY_LIST;
+      this.otpCredentials = Collections.emptyList();
     }
 
     this.realm = realmModel;

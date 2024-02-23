@@ -78,14 +78,14 @@ public class JBossLoggingExtEventListenerProvider implements EventListenerProvid
         this.errorLevel = errorEvent;
         this.excludedEvents = excludedEventType;
 
-        this.allAttrResourceTypes = new HashSet<ResourceType>();
+        this.allAttrResourceTypes = new HashSet<>();
         this.allAttrResourceTypes.add(ResourceType.AUTH_EXECUTION);
         this.allAttrResourceTypes.add(ResourceType.AUTH_FLOW);
         this.allAttrResourceTypes.add(ResourceType.AUTHENTICATOR_CONFIG);
         this.allAttrResourceTypes.add(ResourceType.REQUIRED_ACTION);
         this.allAttrResourceTypes.add(ResourceType.REALM_ROLE_MAPPING);
 
-        this.nameOnlyResourceTypes = new HashSet<ResourceType>();
+        this.nameOnlyResourceTypes = new HashSet<>();
         this.nameOnlyResourceTypes.add(ResourceType.CLIENT_ROLE);
         this.nameOnlyResourceTypes.add(ResourceType.CLIENT_SCOPE_MAPPING);
         this.nameOnlyResourceTypes.add(ResourceType.CLIENT_ROLE_MAPPING);
