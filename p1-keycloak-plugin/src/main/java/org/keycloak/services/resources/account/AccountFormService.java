@@ -381,7 +381,7 @@ public class AccountFormService extends AbstractSecuredLocalService
                   errorMessage.getParameters());
               authSession.removeAuthNote(ACCOUNT_MGMT_FORWARDED_ERROR_NOTE);
             } catch (IOException ioe) {
-              throw new RuntimeException(ioe);
+              throw new IllegalArgumentException(ioe);
             }
           }
         }

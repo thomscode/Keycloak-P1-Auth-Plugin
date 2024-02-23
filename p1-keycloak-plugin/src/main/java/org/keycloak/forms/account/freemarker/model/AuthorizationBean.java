@@ -110,7 +110,7 @@ public class AuthorizationBean {
               .findById(realmModel, null, pathParameters.get(0));
 
       if (resourceInfo != null && !resourceInfo.getOwner().equals(userModel.getId())) {
-        throw new RuntimeException(
+        throw new IllegalStateException(
             "User [" + userModel.getUsername() + "] can not access resource [" + resourceInfo.getId() + "]");
       }
     }

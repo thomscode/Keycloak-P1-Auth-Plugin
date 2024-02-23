@@ -120,9 +120,6 @@ public class FreeMarkerAccountProvider implements AccountProvider {
   /** The FreeMarker provider for processing templates. */
   private FreeMarkerProvider freeMarker;
 
-  /** HTTP headers. */
-  private HttpHeaders headers;
-
   /** Map of additional attributes used in rendering templates. */
   private Map<String, Object> attributes;
 
@@ -167,8 +164,9 @@ public class FreeMarkerAccountProvider implements AccountProvider {
    */
   @Override
   public AccountProvider setHttpHeaders(final HttpHeaders httpHeaders) {
-    this.headers = httpHeaders;
-    return this;
+    // Sets the HTTP headers for the account provider.
+    // headers are never used in this class
+    throw new UnsupportedOperationException("method setHttpHeaders not defined in FreeMarkerAccountProvider class");
   }
 
   /**
@@ -658,10 +656,6 @@ public class FreeMarkerAccountProvider implements AccountProvider {
    * @return This {@code FreeMarkerAccountProvider} instance for method chaining.
    *
    * @see FeaturesBean
-   * @see FeaturesBean#isIdentityProviderFeatureEnabled()
-   * @see FeaturesBean#isEventsHandlingEnabled()
-   * @see FeaturesBean#isPasswordUpdateFeatureSupported()
-   * @see FeaturesBean#isAuthorizationFeatureSupported()
    */
   @Override
   public AccountProvider setFeatures(
