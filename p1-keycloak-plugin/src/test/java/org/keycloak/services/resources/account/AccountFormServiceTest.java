@@ -61,7 +61,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -280,6 +279,9 @@ public class AccountFormServiceTest {
         when(authResult.getToken()).thenReturn(accessToken);
         when(authResult.getUser()).thenReturn(userModel);
 
+        // userSessionModel
+        when(userSessionModel.getUser()).thenReturn(userModel);
+
         // permissionTicketStore
         when(permissionTicketStore.create(any(), any(), any(), any())).thenReturn(permissionTicket);
 
@@ -287,6 +289,7 @@ public class AccountFormServiceTest {
         when(DefaultClientSessionContext.fromClientSessionScopeParameter(any(), any())).thenReturn(defaultClientSessionContext);
 
         // eventBuilder
+        when(eventBuilder.clone()).thenReturn(eventBuilder);
         when(eventBuilder.event(any(EventType.class))).thenReturn(eventBuilder);
         when(eventBuilder.client(any(ClientModel.class))).thenReturn(eventBuilder);
         when(eventBuilder.user(any(UserModel.class))).thenReturn(eventBuilder);
@@ -781,19 +784,25 @@ public class AccountFormServiceTest {
 
     @Test
     public void testProcessPasswordUpdate(){
-        // Condition 1 - Make (auth = null)
+        // Condition 1
+        // constructor
+        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
+        // processPasswordUpdate
+        assertNull(accountFormService.processPasswordUpdate());
+
+        // Condition 2
+
+        // Condition 3
+
+        // Condition 4
+
+        // Condition 9 - Make (auth = null)
         // AuthenticationManager
         when(AuthenticationManager.authenticateIdentityCookie(keycloakSession, realmModel, true)).thenReturn(null);
         // constructor
         accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
         // processPasswordUpdate test
         assertNotNull(accountFormService.processPasswordUpdate());
-
-        // Condition 2
-//        // constructor
-//        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
-//        // eventBuilder.clone() issue
-//        assertNull(accountFormService.processPasswordUpdate());
     }
 
     @Test
