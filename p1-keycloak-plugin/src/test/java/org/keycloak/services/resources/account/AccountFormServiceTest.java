@@ -25,7 +25,10 @@ import org.keycloak.http.HttpRequest;
 import org.keycloak.locale.LocaleSelectorProvider;
 import org.keycloak.locale.LocaleUpdaterProvider;
 import org.keycloak.models.*;
+import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
+import org.keycloak.models.credential.dto.OTPCredentialData;
+import org.keycloak.models.utils.CredentialValidation;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.protocol.oidc.OIDCLoginProtocolService;
 import org.keycloak.protocol.oidc.utils.RedirectUtils;
@@ -48,12 +51,14 @@ import org.keycloak.userprofile.UserProfile;
 import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.userprofile.ValidationException;
 import org.keycloak.util.JsonSerialization;
+import org.keycloak.utils.CredentialHelper;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -73,7 +78,8 @@ import static org.powermock.api.mockito.PowerMockito.*;
         AuthenticationManager.AuthResult.class, AuthenticationManager.class,
         DefaultClientSessionContext.class, EventBuilder.class, AuthorizationProvider.class,
         UserProfileProvider.class, UserProfile.class, UriUtils.class, JsonSerialization.class,
-        RedirectUtils.class, Validation.class, AccountUrls.class, Urls.class
+        RedirectUtils.class, Validation.class, AccountUrls.class, Urls.class, OTPCredentialModel.class,
+        CredentialValidation.class, CredentialHelper.class,
 })
 public class AccountFormServiceTest {
 
@@ -95,6 +101,7 @@ public class AccountFormServiceTest {
     @Mock private AccountProvider accountProvider;
     @Mock private UserSessionModel userSessionModel;
     @Mock private PermissionTicketStore permissionTicketStore;
+    @Mock private OTPCredentialModel otpCredentialModel;
 
     // local variables
     private final String resourceId = "resourceId";
@@ -131,6 +138,9 @@ public class AccountFormServiceTest {
         mockStatic(UriUtils.class);
         mockStatic(JsonSerialization.class);
         mockStatic(RedirectUtils.class);
+        mockStatic(OTPCredentialModel.class);
+        mockStatic(CredentialValidation.class);
+        mockStatic(CredentialHelper.class);
 
         // mocks
         KeycloakContext keycloakContext = mock(KeycloakContext.class);
@@ -153,6 +163,7 @@ public class AccountFormServiceTest {
         AuthenticationSessionProvider authenticationSessionProvider = mock(AuthenticationSessionProvider.class);
         LocaleUpdaterProvider localeUpdaterProvider = mock(LocaleUpdaterProvider.class);
         RootAuthenticationSessionModel rootAuthenticationSessionModel = mock(RootAuthenticationSessionModel.class);
+        OTPCredentialData otpCredentialData = mock(OTPCredentialData.class);
 
         // keycloakSession
         when(keycloakSession.getContext()).thenReturn(keycloakContext);
@@ -285,6 +296,23 @@ public class AccountFormServiceTest {
 
         // userProfileProvider
         when(userProfileProvider.create(any(), any(), any())).thenReturn(userProfile);
+
+        // OTPCredentialModel
+        when(OTPCredentialModel.createFromPolicy(any(), any(), any())).thenReturn(otpCredentialModel);
+        when(otpCredentialModel.getOTPCredentialData()).thenReturn(otpCredentialData);
+        when(otpCredentialModel.getDecodedSecret()).thenReturn("someData".getBytes(StandardCharsets.UTF_8));
+
+        // otpCredentialData
+        when(otpCredentialData.getSubType()).thenReturn("totp");
+        when(otpCredentialData.getAlgorithm()).thenReturn("some algo");
+        when(otpCredentialData.getDigits()).thenReturn(3);
+        when(otpCredentialData.getPeriod()).thenReturn(5);
+
+        // CredentialValidation
+        when(CredentialValidation.validOTP(anyString(), any(), anyInt())).thenReturn(false);
+
+        // CredentialHelper
+        when(CredentialHelper.createOTPCredential(any(), any(), any(), anyString(), any())).thenReturn(false);
     }
 
     @Test
@@ -699,7 +727,38 @@ public class AccountFormServiceTest {
 //        //processTotpUpdate test
 //        assertNull(accountFormService.processTotpUpdate());
 
-        // Condition 4 - Action = Cancel
+        // Condition 3 - totp validOTP CredentialHelper = false
+        multivaluedMap = new MultivaluedHashMap<>();
+        // Add some sample values
+        multivaluedMap.add("stateChecker", "value1");
+        multivaluedMap.add("totp", "value2");
+        multivaluedMap.add("totpSecret", "value3");
+        multivaluedMap.add("userLabel", "value4");
+        // conditions
+        when(httpRequest.getDecodedFormParameters()).thenReturn(multivaluedMap);
+        when(CredentialValidation.validOTP(anyString(), any(), anyInt())).thenReturn(true);
+        // constructor
+        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
+        //processTotpUpdate test
+        assertNull(accountFormService.processTotpUpdate());
+
+        // Condition 4 - totp validOTP CredentialHelper = true
+        // conditions
+        when(CredentialHelper.createOTPCredential(any(), any(), any(), anyString(), any())).thenReturn(true);
+        // constructor
+        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
+        //processTotpUpdate test
+        assertNull(accountFormService.processTotpUpdate());
+
+        // Condition 5 - totp not validOTP
+        // conditions
+        when(CredentialValidation.validOTP(anyString(), any(), anyInt())).thenReturn(false);
+        // constructor
+        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
+        //processTotpUpdate test
+        assertNull(accountFormService.processTotpUpdate());
+
+        // Condition 6 - Action = Cancel
         // variables
         multivaluedMap = new MultivaluedHashMap<>();
         // Add some sample values
@@ -711,7 +770,7 @@ public class AccountFormServiceTest {
         //processTotpUpdate test
         assertNull(accountFormService.processTotpUpdate());
 
-        // Condition 5 - Make (auth = null)
+        // Condition 7 - Make (auth = null)
         // AuthenticationManager
         when(AuthenticationManager.authenticateIdentityCookie(keycloakSession, realmModel, true)).thenReturn(null);
         // constructor
