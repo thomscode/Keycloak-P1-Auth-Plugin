@@ -23,7 +23,6 @@ dependencies {
     implementation 'org.springframework.security:spring-security-web:5.5.0'
     implementation 'javax.servlet:javax.servlet-api:3.1.0'
 
-
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     testImplementation 'org.mockito:mockito-core:3.12.4'
@@ -34,7 +33,6 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'jakarta.enterprise:jakarta.enterprise.cdi-api:4.0.0'
     testImplementation 'jakarta.inject:jakarta.inject-api:2.0.1'
-
 }
 
 test {
