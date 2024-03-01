@@ -39,12 +39,14 @@ import org.keycloak.services.ForbiddenException;
 import org.keycloak.services.Urls;
 import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager;
+import org.keycloak.services.messages.Messages;
 import org.keycloak.services.resources.RealmsResource;
 import org.keycloak.services.util.DefaultClientSessionContext;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.AuthenticationSessionProvider;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
+import org.keycloak.storage.ReadOnlyException;
 import org.keycloak.urls.UrlType;
 import org.keycloak.userprofile.AttributeChangeListener;
 import org.keycloak.userprofile.UserProfile;
@@ -78,7 +80,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
         DefaultClientSessionContext.class, EventBuilder.class, AuthorizationProvider.class,
         UserProfileProvider.class, UserProfile.class, UriUtils.class, JsonSerialization.class,
         RedirectUtils.class, Validation.class, AccountUrls.class, Urls.class, OTPCredentialModel.class,
-        CredentialValidation.class, CredentialHelper.class,
+        CredentialValidation.class, CredentialHelper.class, ValidationException.class,
 })
 public class AccountFormServiceTest {
 
@@ -421,7 +423,7 @@ public class AccountFormServiceTest {
         when(keycloakSession.getContext().getUri(any(UrlType.class))).thenReturn(keycloakUriInfo);
         // constructor
         accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
-        //processAccountUpdate test
+        //accountPage test
         assertNull(accountFormService.accountPage());
 
         // Condition 2
@@ -581,8 +583,9 @@ public class AccountFormServiceTest {
         assertNull(accountFormService.processAccountUpdate());
 
         // Condition 2 - ValidationException (empty error)
+        ValidationException validationException = mock(ValidationException.class);
         // throwException
-        doThrow(new ValidationException()).when(userProfile).update(anyBoolean(), any(AttributeChangeListener.class));
+        doThrow(validationException).when(userProfile).update(anyBoolean(), any(AttributeChangeListener.class));
         // constructor
         accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
         //processAccountUpdate test
@@ -604,7 +607,31 @@ public class AccountFormServiceTest {
         // processAccountUpdate test
         assertEquals(response, accountFormService.processAccountUpdate());
 
-        // Condition 4 - Action = Cancel
+        // Condition 4 - ValidationException (error with value) - EMAIL_EXISTS and USERNAME_EXISTS
+        // conditions
+        when(validationException.hasError(Messages.EMAIL_EXISTS, Messages.USERNAME_EXISTS)).thenReturn(true);
+        // constructor
+        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
+        // processAccountUpdate test
+        assertEquals(response, accountFormService.processAccountUpdate());
+
+        // Condition 5 - ValidationException (error with value) - READ_ONLY_USERNAME
+        // conditions
+        when(validationException.hasError(Messages.READ_ONLY_USERNAME)).thenReturn(true);
+        // constructor
+        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
+        // processAccountUpdate test
+        assertEquals(response, accountFormService.processAccountUpdate());
+
+        // Condition 6 - ReadOnlyException
+        // throwException
+        doThrow(new ReadOnlyException()).when(userProfile).update(anyBoolean(), any(AttributeChangeListener.class));
+        // constructor
+        accountFormService = new AccountFormService(keycloakSession, clientModel, eventBuilder);
+        // processAccountUpdate test
+        assertEquals(response, accountFormService.processAccountUpdate());
+
+        // Condition 7 - Action = Cancel
         // variables
         MultivaluedMap<String, String> multivaluedMap = new MultivaluedHashMap<>();
         // Add some sample values
@@ -616,7 +643,7 @@ public class AccountFormServiceTest {
         //processAccountUpdate test
         assertNotNull(accountFormService.processAccountUpdate());
 
-        // Condition 5 - Make (auth = null)
+        // Condition 8 - Make (auth = null)
         // AuthenticationManager
         when(AuthenticationManager.authenticateIdentityCookie(keycloakSession, realmModel, true)).thenReturn(null);
         // constructor
