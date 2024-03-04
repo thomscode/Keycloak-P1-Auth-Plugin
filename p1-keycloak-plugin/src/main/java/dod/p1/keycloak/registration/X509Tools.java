@@ -42,18 +42,18 @@ import static dod.p1.keycloak.common.CommonConfig.getInstance;
 
 public final class X509Tools {
 
-    /**
-     * The LOGGER.
-     */
+    /** The LOGGER. */
     private static final Logger LOGGER = LogManager.getLogger(X509Tools.class);
-    /**
-     * The certificate policy OID.
-     */
+
+    /** The certificate policy OID. */
     private static final String CERTIFICATE_POLICY_OID = "2.5.29.32";
-    /**
-     * The max number of certificate policies to check.
-     */
+
+    /** The max number of certificate policies to check. */
     private static final int MAX_CERT_POLICIES_TO_CHECK = 10;
+
+    // Sonarqube critical fix
+    /** Get x509 identity */
+    private static final String GET_X509_IDENTITY = "GET_X509_IDENTITY";
 
     private static String getLogPrefix(final AuthenticationSessionModel authenticationSession, final String suffix) {
         return "P1_X509_TOOLS_" + suffix + "_" + authenticationSession.getParentSession().getId();
@@ -202,7 +202,7 @@ public final class X509Tools {
             X509Certificate responderCert = null;
             Date date = null;
             LOGGER.debug("{}: ZacsOCSPProvider - cert: {} issuer: {} responderURI: {}",
-                    getLogPrefix(authenticationSession, "GET_X509_IDENTITY"),
+                    getLogPrefix(authenticationSession, GET_X509_IDENTITY),
                     certs[0],
                     issuerCertificate,
                     responderURIsAsURI.get(0)
@@ -220,11 +220,11 @@ public final class X509Tools {
             // Check the OCSP revocation status
             if (ocspStatus.getRevocationStatus() != OCSPProvider.RevocationStatus.GOOD) {
                 LOGGER.warn("{}: ZacsOCSPProvider check failed",
-                        getLogPrefix(authenticationSession, "GET_X509_IDENTITY"));
+                        getLogPrefix(authenticationSession, GET_X509_IDENTITY));
                 return null;
             } else {
                 LOGGER.debug("{}: ZacsOCSPProvider check passed",
-                        getLogPrefix(authenticationSession, "GET_X509_IDENTITY"));
+                        getLogPrefix(authenticationSession, GET_X509_IDENTITY));
             }
         } catch (CertificateEncodingException e) {
             LOGGER.warn("{} Error while getting responder URIs from certificate: {}",
