@@ -52,7 +52,7 @@ public final class X509Tools {
     private static final int MAX_CERT_POLICIES_TO_CHECK = 10;
 
     // Sonarqube critical fix
-    /** Get x509 identity */
+    /** Get x509 identity. */
     private static final String GET_X509_IDENTITY = "GET_X509_IDENTITY";
 
     private static String getLogPrefix(final AuthenticationSessionModel authenticationSession, final String suffix) {
