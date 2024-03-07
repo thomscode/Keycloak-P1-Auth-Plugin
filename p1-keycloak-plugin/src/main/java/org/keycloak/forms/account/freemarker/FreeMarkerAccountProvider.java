@@ -166,7 +166,7 @@ public class FreeMarkerAccountProvider implements AccountProvider {
   public AccountProvider setHttpHeaders(final HttpHeaders httpHeaders) {
     // Sets the HTTP headers for the account provider.
     // headers are never used in this class
-    throw new UnsupportedOperationException("method setHttpHeaders not defined in FreeMarkerAccountProvider class");
+    return this;
   }
 
   /**

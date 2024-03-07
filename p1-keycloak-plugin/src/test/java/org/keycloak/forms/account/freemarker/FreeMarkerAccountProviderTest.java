@@ -109,7 +109,7 @@
          assertEquals(FreeMarkerAccountProvider.class, freeMarkerAccountProvider.setUriInfo(uriInfo).getClass());
      }
 
-     @Test (expected = UnsupportedOperationException.class)
+     @Test
      public void setHttpHeadersTest() {
          // constructor
          freeMarkerAccountProvider = new FreeMarkerAccountProvider(keycloakSession);
